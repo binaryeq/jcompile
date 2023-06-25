@@ -7,7 +7,7 @@ DOCKER_CONTAINER="svenruppert-openjdk-8.0.192"
 #DOCKER_IMAGE="adoptopenjdk/maven-openjdk8:latest"
 #DOCKER_CONTAINER="adopt-openjdk-8"
 
-DATASET_HOST=$(builtin cd $dir; pwd)
+DATASET_HOST=$(builtin cd $dir; pwd)/jcompile-dataset
 DATASET_CONTAINER="/dataset"
 
 echo "using data folder ${DATASET_HOST}"
