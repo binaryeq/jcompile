@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# does not work with arm cpus !
+# Note: does not work with ARM CPUs !
 DOCKER_IMAGE="svenruppert/maven-3.6.2-liberica:1.8.192"
 DOCKER_CONTAINER="svenruppert-openjdk-8.0.192"
 
@@ -16,7 +16,7 @@ MAVEN_CACHE_CONTAINER="/maven-cache"
 PROJECT2BUILD=$DATASET_CONTAINER/commons-io
 
 # run docker image from hub with java and mvn
-# count dataset
+# share & reuse maven cache for performance
 
 docker stop $DOCKER_CONTAINER
 docker rm $DOCKER_CONTAINER
