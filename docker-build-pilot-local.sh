@@ -26,9 +26,9 @@ PROJECT2BUILD=$DATASET_CONTAINER/commons-io
 # run docker image from hub with java and mvn
 # share & reuse maven cache for performance
 
-docker stop $DOCKER_CONTAINER
-docker rm $DOCKER_CONTAINER
+#docker stop $DOCKER_CONTAINER
 docker pull $DOCKER_IMAGE
+#docker start $DOCKER_CONTAINER
 docker run \
 	-dit \
 	--volume ${DATASET_HOST}:${DATASET_CONTAINER} \
@@ -36,37 +36,10 @@ docker run \
 	--volume ${MAVEN_HOST}:${MAVEN_CONTAINER} \
 	--workdir $PROJECT2BUILD \
 	--name $DOCKER_CONTAINER $DOCKER_IMAGE \
-	#mvn -version
 
-# 	#--env PATH="$PATH:${MAVEN_CONTAINER}/bin" \	
-#mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true clean package
-#docker exec -it $DOCKER_CONTAINER mvn -version
-
-#echo "setting path"
-#docker exec -it $DOCKER_CONTAINER bash -c 'exec env PATH=${PATH}:${MAVEN_CONTAINER}/bin'
-# bash -c 'exec env PATH=/home/app:$PATH bash'
-#echo "--------------"
-
-#echo "echo path"
-#docker exec -it $DOCKER_CONTAINER bash -c "exec echo $PATH"
-echo "--------------"
-
-echo "displaying Java version ---"
-docker exec -it $DOCKER_CONTAINER java -version
-echo "--------------"
-
-echo "displaying Javac version --- "
-docker exec \
-	-it $DOCKER_CONTAINER \
- 	javac -version
-echo "--------------"
-
-echo "displaying apache-maven version --- "
-docker exec \
-	-it $DOCKER_CONTAINER \
- 	ls ${MAVEN_CONTAINER}
-echo "--------------"
 
 echo "building project"
 docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true clean package
 
+docker stop $DOCKER_CONTAINER
+docker rm $DOCKER_CONTAINER  # to avoid container with this name already in use
