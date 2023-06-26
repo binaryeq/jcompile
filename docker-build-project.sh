@@ -8,21 +8,25 @@
 
 #DOCKER_IMAGE="adoptopenjdk/openjdk8:jre8u372-b07-ubuntu"  # does not contain javac
 
+DOCKER_IMAGE=$1
+DOCKER_CONTAINER=$2
+
 PROJECT="commons-io"
 # needed for caching
 JAR_NAME="commons-io-2.10.0.jar"
 TAG="rel/commons-io-2.10.0"
 RESULT_ROOT_FOLDER="jars"
 
-DOCKER_IMAGE="eclipse-temurin:8u372-b07-jdk"
-DOCKER_CONTAINER="openjdk8-8.0.372"
+
+echo "using docker image: ${DOCKER_IMAGE}"
+echo "using docker container name: ${DOCKER_CONTAINER}"
 
 RESULT_FOLDER=${RESULT_ROOT_FOLDER}/${DOCKER_CONTAINER}
 RESULT_FILE=${RESULT_FOLDER}/${JAR_NAME}
 
 
 if test -f "${RESULT_FILE}"; then
-    echo "${RESULT_FILE} already exists, no compilation needed (delete file to recompile)"
+    echo "${RESULT_FILE} already exists, no compilation needed -- delete file to recompile" 
     exit 0
 fi
 
@@ -44,6 +48,11 @@ MAVEN_CACHE_HOST="$(pwd)/.m2"
 MAVEN_CACHE_CONTAINER="/maven-cache"
 
 PROJECT2BUILD=${DATASET_CONTAINER}/${PROJECT}
+
+
+# clear old build from outside the container -- otherwise, when the container build fails,
+# old jars might be copied over
+mvn clean -f ${DATASET_HOST}/${PROJECT}/pom.xml
 
 # run docker image from hub with java and mvn
 # share & reuse maven cache for performance
