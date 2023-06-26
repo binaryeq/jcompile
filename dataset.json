@@ -1,0 +1,38 @@
+[
+	{
+		"name":"commons-io",
+		"tag":"rel/commons-io-2.7",
+		"jar":"commons-io-2.7.jar"
+	},
+	{
+		"name":"commons-io",
+		"tag":"rel/commons-io-2.8.0",
+		"jar":"commons-io-2.8.0.jar"
+	},
+	{
+		"name":"commons-io",
+		"tag":"rel/commons-io-2.9.0",
+		"jar":"commons-io-2.9.0.jar"
+	},
+	{
+		"name":"commons-io",
+		"tag":"rel/commons-io-2.10.0",
+		"jar":"commons-io-2.10.0.jar"
+	},
+	{
+		"name":"commons-io",
+		"tag":"rel/commons-io-2.11.0",
+		"jar":"commons-io-2.11.0.jar"
+	},
+		{
+		"name":"commons-io",
+		"tag":"rel/commons-io-2.12.0",
+		"jar":"commons-io-2.12.0.jar"
+	},
+	{
+		"name":"commons-io",
+		"tag":"rel/commons-io-2.13.0",
+		"jar":"commons-io-2.13.0.jar"
+	}
+
+]
