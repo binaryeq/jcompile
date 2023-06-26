@@ -10,7 +10,8 @@
 
 PROJECT="commons-io"
 # needed for caching
-JAR_NAME="commons-io-2.11.0.jar"
+JAR_NAME="commons-io-2.10.0.jar"
+TAG="rel/commons-io-2.10.0"
 RESULT_ROOT_FOLDER="jars"
 
 DOCKER_IMAGE="eclipse-temurin:8u372-b07-jdk"
@@ -27,8 +28,12 @@ fi
 
 mkdir -p ${RESULT_FOLDER}
 
+
 DATASET_HOST="$(pwd)/dataset"
 DATASET_CONTAINER="/dataset"
+
+echo "checking out tag ${TAG}"
+git -C ${DATASET_HOST}/${PROJECT} checkout tags/${TAG}
 
 MAVEN_HOST="$(pwd)/apache-maven-3.9.2"
 MAVEN_CONTAINER="/apache-maven"
