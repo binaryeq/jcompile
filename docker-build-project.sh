@@ -1,29 +1,28 @@
 #!/bin/sh
 
-# Note: does not work with ARM CPUs !
-#DOCKER_IMAGE="svenruppert/maven-3.6.2-liberica:1.8.192"
-#DOCKER_CONTAINER="svenruppert-openjdk-8.0.192"
-
-#docker pull adoptopenjdk/openjdk8:jre8u372-b07-ubuntu
-
-#DOCKER_IMAGE="adoptopenjdk/openjdk8:jre8u372-b07-ubuntu"  # does not contain javac
+# Build a given mvn project using a Java compiler provided by a docker container. 
+# Maven is provided by the host to ensure consistency, and the creation of further images. 
+# The Maven cache (.m2) is also provided by the host for performance.
+# @author jens dietrich
 
 DOCKER_IMAGE=$1
 DOCKER_CONTAINER=$2
-
-PROJECT="commons-io"
+PROJECT=$3
 # needed for caching
-JAR_NAME="commons-io-2.10.0.jar"
-TAG="rel/commons-io-2.10.0"
-RESULT_ROOT_FOLDER="jars"
-
+JAR_NAME=$4
+TAG=$5
 
 echo "using docker image: ${DOCKER_IMAGE}"
 echo "using docker container name: ${DOCKER_CONTAINER}"
+echo "project name: ${PROJECT}"
+echo "project jar to be generated: ${JAR_NAME}"
+echo "project tag: ${TAG}"
+
+
+RESULT_ROOT_FOLDER="jars"
 
 RESULT_FOLDER=${RESULT_ROOT_FOLDER}/${DOCKER_CONTAINER}
 RESULT_FILE=${RESULT_FOLDER}/${JAR_NAME}
-
 
 if test -f "${RESULT_FILE}"; then
     echo "${RESULT_FILE} already exists, no compilation needed -- delete file to recompile" 
@@ -31,7 +30,6 @@ if test -f "${RESULT_FILE}"; then
 fi
 
 mkdir -p ${RESULT_FOLDER}
-
 
 DATASET_HOST="$(pwd)/dataset"
 DATASET_CONTAINER="/dataset"
@@ -68,9 +66,8 @@ docker run \
 	--workdir $PROJECT2BUILD \
 	--name $DOCKER_CONTAINER $DOCKER_IMAGE \
 
-
 echo "building project"
-docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true clean package
+docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true clean package
 
 echo "copying result into ${RESULT_FOLDER}"
 cp ${DATASET_HOST}/${PROJECT}/target/${JAR_NAME} ${RESULT_FOLDER}

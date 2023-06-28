@@ -14,5 +14,14 @@
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"openjdk11-11.0.19_7"
+	},
+	{
+		"image":"eclipse-temurin:11.0.12_7-jdk",
+		"name":"openjdk11-11.0.12_7"
+	},
+	{
+		"image":"eclipse-temurin:17.0.7_7-jdk",
+		"name":"openjdk17-17.0.7_7"
 	}
+
 ]
