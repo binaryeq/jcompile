@@ -21,13 +21,32 @@ echo "project tag: ${TAG}"
 
 RESULT_ROOT_FOLDER="jars"
 
+TMP_LOG="build.log"
+
 RESULT_FOLDER=${RESULT_ROOT_FOLDER}/${DOCKER_CONTAINER}
 RESULT_FILE=${RESULT_FOLDER}/${JAR_NAME}
+RESULT_ERROR_LOG=${RESULT_FOLDER}/${JAR_NAME}".error"
 
 if test -f "${RESULT_FILE}"; then
-    echo "${RESULT_FILE} already exists, no compilation needed -- delete file to recompile" 
+	echo ""
+    echo "USE CACHE -- ${RESULT_FILE} already exists, no compilation needed -- delete file to recompile" 
+    # for useability in batch scripts
+	echo ""
+	echo "================================================"
+	echo ""
     exit 0
 fi
+
+if test -f "${RESULT_ERROR_LOG}"; then
+	echo ""
+    echo "FAILIRE  -- previous compilation has failed, details in: ${RESULT_ERROR_LOG} , delete ${RESULT_ERROR_LOG} to attempt new build" 
+    # for useability in batch scripts
+	echo ""
+	echo "================================================"
+	echo ""
+    exit 0
+fi
+
 
 mkdir -p ${RESULT_FOLDER}
 
@@ -67,11 +86,23 @@ docker run \
 	--name $DOCKER_CONTAINER $DOCKER_IMAGE \
 
 echo "building project"
-docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true clean package
+docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package  | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
 
-echo "copying result into ${RESULT_FOLDER}"
-cp ${DATASET_HOST}/${PROJECT}/target/${JAR_NAME} ${RESULT_FOLDER}
 
+echo ""
+if test -f "${DATASET_HOST}/${PROJECT}/target/${JAR_NAME}"; then
+	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
+	cp ${DATASET_HOST}/${PROJECT}/target/${JAR_NAME} ${RESULT_FOLDER}
+	docker stop $DOCKER_CONTAINER
+else 
+	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
+	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
+fi
 
 docker stop $DOCKER_CONTAINER
 docker rm $DOCKER_CONTAINER  # to avoid container with this name already in use
+
+# for useability in batch scripts
+echo ""
+echo "================================================"
+echo ""

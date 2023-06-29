@@ -5,7 +5,9 @@
 
 
 compilers=`cat java-compilers.json`
+#compilers=`cat java-compilers-debug.json`
 projects=`cat dataset.json`
+#projects=`cat dataset-debug.json`
 for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
     _jq() {
      	echo ${row} | base64 --decode | jq -r ${1}
