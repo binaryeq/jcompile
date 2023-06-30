@@ -30,8 +30,8 @@ for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
     	PROJECT_JAR="$(_jq '.jar')"
     	#echo "\tproject name: ${PROJECT_NAME}"
    		#echo "\tproject tag: ${PROJECT_TAG}"
-   		echo "\tproject jar: ${PROJECT_JAR}"
-   		echo ""
+   		#echo "\tproject jar: ${PROJECT_JAR}"
+   		#echo ""
 
    		sh ./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG}
 	done

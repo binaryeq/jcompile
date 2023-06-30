@@ -12,12 +12,12 @@ PROJECT=$3
 JAR_NAME=$4
 TAG=$5
 
-echo "using docker image: ${DOCKER_IMAGE}"
-echo "using docker container name: ${DOCKER_CONTAINER}"
+echo "docker image: ${DOCKER_IMAGE}"
+echo "docker container name: ${DOCKER_CONTAINER}"
 echo "project name: ${PROJECT}"
 echo "project jar to be generated: ${JAR_NAME}"
 echo "project tag: ${TAG}"
-
+echo ""
 
 RESULT_ROOT_FOLDER="jars"
 
@@ -39,7 +39,7 @@ fi
 
 if test -f "${RESULT_ERROR_LOG}"; then
 	echo ""
-    echo "FAILIRE  -- previous compilation has failed, details in: ${RESULT_ERROR_LOG} , delete ${RESULT_ERROR_LOG} to attempt new build" 
+    echo "FAILURE  -- previous compilation has failed, details in: ${RESULT_ERROR_LOG} , delete ${RESULT_ERROR_LOG} to attempt new build" 
     # for useability in batch scripts
 	echo ""
 	echo "================================================"

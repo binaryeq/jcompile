@@ -11,7 +11,14 @@
 		"image":"eclipse-temurin:8u302-b08-jdk",
 		"name":"openjdk-8.0.302"
 	},	
-
+	{
+		"image":"openjdk:9.0.1-jdk",
+		"name":"openjdk-9.0.1"
+	},
+	{
+		"image":"openjdk:10.0.2-jdk",
+		"name":"openjdk-10.0.2-13-jdk"
+	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"openjdk-11.0.19"
@@ -24,7 +31,14 @@
 		"image":"eclipse-temurin:11.0.12_7-jdk",
 		"name":"openjdk-11.0.12"
 	},
-
+	{
+		"image":"openjdk:15.0.1-jdk",
+		"name":"openjdk-15.0.1"
+	},
+	{
+		"image":"openjdk:16.0.1-jdk",
+		"name":"openjdk-16.0.1-jdk"
+	},
 	{
 		"image":"eclipse-temurin:17.0.1_12-jdk",
 		"name":"openjdk-17.0.1"
