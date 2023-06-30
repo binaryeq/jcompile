@@ -6,7 +6,6 @@
 
 Using the data sets (projects) defined in `dataset.json` and the JVMs defined in `java-compilers.json`, build all projects and save the jars generated or errors in `jars/`.
 
-
 `docker-build-project.sh`
 
 Build a single project. Expected arguments: 
@@ -53,7 +52,7 @@ Those files can be used to analyse *why* builds fail.
 
 ### Source option 5 is no longer supported. Use 8 or later. 
 
-Example: *commons-cli* and *commons-math*. Those projects were not included in the dataset.
+Examples: *commons-cli*, *commons-math*, *gson*. Those projects were not included in the dataset.
 
 ### Source | Target option 6  is no longer supported. Use 8 or later. 
 
@@ -71,7 +70,7 @@ Example: *commons-logging*. Those projects were not included in the dataset.
 
 ### No Tags
 
-Example: *commons-ognl*.  Those projects were not included in the dataset.
+Example: *commons-ognl*, *snakeyaml*.  Those projects were not included in the dataset.
 
 
 ### Execution bundle-manifest of goal org.apache.felix:maven-bundle-plugin:4.1.0:manifest failed.: ConcurrentModificationException
@@ -84,6 +83,8 @@ In these case we attempt builds, and log errors.
 ### org.codehaus.plexus.util.xml.pull.XmlPullParserException: UTF-8 BOM plus xml decl of ISO-8859-1 is incompatible 
 
 This issue was observed bulding `commons-bcel`. Can still be build using `-Dcyclonedx.skip=true` to disable building a bom. 
+
+
 
 
 

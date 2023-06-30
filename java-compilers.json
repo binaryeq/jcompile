@@ -17,7 +17,7 @@
 	},
 	{
 		"image":"openjdk:10.0.2-jdk",
-		"name":"openjdk-10.0.2-13-jdk"
+		"name":"openjdk-10.0.2"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
@@ -25,7 +25,7 @@
 	},
 	{
 		"image":"eclipse-temurin:11.0.16.1_1-jdk",
-		"name":"openjdk-11.0.16.1"
+		"name":"openjdk-11.0.16"
 	},
 	{
 		"image":"eclipse-temurin:11.0.12_7-jdk",
@@ -37,7 +37,7 @@
 	},
 	{
 		"image":"openjdk:16.0.1-jdk",
-		"name":"openjdk-16.0.1-jdk"
+		"name":"openjdk-16.0.1"
 	},
 	{
 		"image":"eclipse-temurin:17.0.1_12-jdk",
