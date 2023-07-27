@@ -1,0 +1,14 @@
+[
+	{
+		"image":"eclipse-temurin:8u302-b08-jdk",
+		"name":"openjdk-8.0.302"
+	},	
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"openjdk-11.0.19"
+	},
+	{
+		"image":"eclipse-temurin:17.0.7_7-jdk",
+		"name":"openjdk-17.0.7"
+	}
+]

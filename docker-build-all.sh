@@ -8,6 +8,10 @@ compilers=`cat java-compilers.json`
 #compilers=`cat java-compilers-debug.json`
 projects=`cat dataset.json`
 #projects=`cat dataset-debug.json`
+
+
+# root result folders
+JARS="jars"
 for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
     _jq() {
      	echo ${row} | base64 --decode | jq -r ${1}
@@ -33,7 +37,7 @@ for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
    		#echo "\tproject jar: ${PROJECT_JAR}"
    		#echo ""
 
-   		sh ./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG}
+   		sh ./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS}
 	done
 	echo "-------------------------------------"
 

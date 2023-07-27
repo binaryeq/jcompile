@@ -11,15 +11,18 @@ PROJECT=$3
 # needed for caching
 JAR_NAME=$4
 TAG=$5
+# result destination
+RESULT_ROOT_FOLDER=$6
 
 echo "docker image: ${DOCKER_IMAGE}"
 echo "docker container name: ${DOCKER_CONTAINER}"
 echo "project name: ${PROJECT}"
 echo "project jar to be generated: ${JAR_NAME}"
 echo "project tag: ${TAG}"
+echo "result root folder: ${RESULT_ROOT_FOLDER}"
 echo ""
 
-RESULT_ROOT_FOLDER="jars"
+
 
 TMP_LOG="build.log"
 
