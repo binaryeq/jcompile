@@ -247,6 +247,31 @@
 		"name":"JSON-java",
 		"tag":"20211205",
 		"jar":"json-20211205.jar"
+	},
+	{
+		"name":"jackson-core",
+		"tag":"jackson-core-2.15.2",
+		"jar":"original-jackson-core-2.15.2.jar"
+	},
+	{
+		"name":"jackson-core",
+		"tag":"jackson-core-2.15.1",
+		"jar":"original-jackson-core-2.15.1.jar"
+	},
+	{
+		"name":"jackson-core",
+		"tag":"jackson-core-2.15.0",
+		"jar":"original-jackson-core-2.15.0.jar"
+	},
+	{
+		"name":"jackson-core",
+		"tag":"jackson-core-2.14.3",
+		"jar":"jackson-core-2.14.3.jar"
+	},
+	{
+		"name":"jackson-core",
+		"tag":"jackson-core-2.14.2",
+		"jar":"jackson-core-2.14.2.jar"
 	}
 
 ]
