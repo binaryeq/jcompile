@@ -5,11 +5,6 @@
 		"jar":"commons-io-2.12.0.jar"
 	},
 	{
-		"name":"commons-lang",
-		"tag":"rel/commons-lang-3.12.0",
-		"jar":"commons-lang3-3.12.0.jar"
-	},
-	{
 		"name":"commons-codec",
 		"tag":"rel/commons-codec-1.16.0",
 		"jar":"commons-codec-1.16.0.jar"
@@ -30,11 +25,6 @@
 		"jar":"commons-compress-1.16.1.jar"
 	},
 	{
-		"name":"commons-compress",
-		"tag":"rel/1.16",
-		"jar":"commons-compress-1.16.jar"
-	},
-	{
 		"name":"commons-csv",
 		"tag":"rel/commons-csv-1.6",
 		"jar":"commons-csv-1.6.jar"
@@ -53,11 +43,6 @@
 		"name":"jackson-core",
 		"tag":"jackson-core-2.15.2",
 		"jar":"original-jackson-core-2.15.2.jar"
-	},
-	{
-		"name":"jackson-core",
-		"tag":"jackson-core-2.14.2",
-		"jar":"jackson-core-2.14.2.jar"
 	}
 
 ]
