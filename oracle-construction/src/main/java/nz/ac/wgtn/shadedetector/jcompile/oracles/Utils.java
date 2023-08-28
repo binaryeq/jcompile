@@ -1,6 +1,6 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Sets;
 
 import java.io.IOException;
 import java.net.URI;
@@ -60,6 +60,25 @@ public class Utils {
             }
         }
         return classFiles;
+    }
+
+    public static byte[] read(ZipPath zipPath) throws IOException, URISyntaxException {
+        URI uri = zipPath.outerPath().toUri();
+        uri = new URI("jar:"+uri);
+        Map<String, String> env = new HashMap<>();
+        try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+            Path entry = zipfs.getPath(zipPath.innerPath().toString());
+            return Files.readAllBytes(entry);
+        }
+    }
+
+    // find commons paths, note that we can not rely on Path::equal here
+    // note that the file system is not checked, this is mainly used to compare the content of zip files or folders
+    public static Set<Path> findCommonPaths(Set<Path> paths1, Set<Path> paths2) {
+        Map<String,Path> index1 = paths1.stream().collect(Collectors.toMap(Path::toString,p->p));
+        Map<String,Path> index2 = paths2.stream().collect(Collectors.toMap(Path::toString,p->p));
+        Set<String> commonPathNames = Sets.intersection(index1.keySet(),index2.keySet());
+        return  commonPathNames.stream().map(n -> index1.get(n)).collect(Collectors.toSet());
     }
 
     // for testing TODO: remove
