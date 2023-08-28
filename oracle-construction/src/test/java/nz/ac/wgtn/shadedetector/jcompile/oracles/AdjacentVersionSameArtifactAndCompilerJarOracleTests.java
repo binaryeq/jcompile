@@ -12,13 +12,13 @@ import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.pair;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AdjacentVersionSameArtifactAndCompilerTests {
+public class AdjacentVersionSameArtifactAndCompilerJarOracleTests {
 
     private static List<Pair<Path, Path>> oracle = null;
 
     @BeforeAll
     public static void buildOracle () throws IOException {
-        oracle = new AdjacentVersionSameArtifactAndCompiler().build(JARS);
+        oracle = new AdjacentVersionSameArtifactAndCompilerJarOracle().build(JARS);
     }
 
     @AfterAll

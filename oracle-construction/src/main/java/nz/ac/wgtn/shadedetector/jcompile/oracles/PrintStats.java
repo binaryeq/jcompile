@@ -29,10 +29,10 @@ public class PrintStats {
         int numberOfComponents = Utils.collectJarsByComponent(jarFolder).size();
         System.out.println("components (unversioned): " + numberOfComponents);
 
-        int sameArtifactDifferentCompilerOracleSize  = new SameArtifactDifferentCompiler().build(jarFolder).size() ;
+        int sameArtifactDifferentCompilerOracleSize  = new SameArtifactDifferentCompilerJarOracle().build(jarFolder).size() ;
         System.out.println("oracle -- same artifact, different (adjacent) compiler pairs: " + sameArtifactDifferentCompilerOracleSize);
 
-        int sameComponentAndCompilerAdjacentVersionOracleSize  = new AdjacentVersionSameArtifactAndCompiler().build(jarFolder).size() ;
+        int sameComponentAndCompilerAdjacentVersionOracleSize  = new AdjacentVersionSameArtifactAndCompilerJarOracle().build(jarFolder).size() ;
         System.out.println("oracle -- same component and component, different (adjacent) version pairs: " + sameComponentAndCompilerAdjacentVersionOracleSize);
     }
 }

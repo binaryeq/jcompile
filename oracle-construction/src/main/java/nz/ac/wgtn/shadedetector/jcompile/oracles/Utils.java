@@ -1,11 +1,17 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import java.io.File;
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -14,7 +20,6 @@ import java.util.stream.Collectors;
  */
 public class Utils {
 
-
     public static final Function<Path,String> COMPILER_USED = p -> p.getParent().getFileName().toString();
     public static final Function<Path,String> COMPONENT_NAME = p -> {
         String fileName = p.getFileName().toString();
@@ -22,12 +27,57 @@ public class Utils {
     };
     public static final Function<Path,String> ARTIFACT = p -> p.getFileName().toString();
 
+    private static final Pattern INNER_CLASS_PATTERN = Pattern.compile("\\$\\d+");
+    public static boolean isAnonymousInnerClass (Path p) {
+        return INNER_CLASS_PATTERN.matcher(p.getFileName().toString()).find();
+    }
+
+    public static boolean isPackageInfo (Path p) {
+        return p.getFileName().toString().equals("package-info.class");
+    }
+
     public static Set<Path> collectJars(Path jarFolder) throws IOException {
         return Files.walk(jarFolder)
             .filter(Files::exists)
             .filter(f -> f.getFileName().toString().endsWith(".jar"))  // this excludes .jar.error !
             .collect(Collectors.toSet());
     }
+
+    public static Set<Path> collectClasses(Path jar) throws IOException, URISyntaxException {
+        URI uri = jar.toUri();
+        uri = new URI("jar:"+uri);
+        Map<String, String> env = new HashMap<>();
+        Set<Path> classFiles = new HashSet<>();
+        try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+            for (Path root:zipfs.getRootDirectories()) {
+                Files.walk(root)
+                    .filter(Files::exists)
+                    .filter(f -> !Files.isDirectory(f))
+                    .filter(f -> f.getFileName()!=null)
+                    .filter(f -> f.getFileName().toString().endsWith(".class"))  // this excludes .jar.error !
+                    //.map(f -> jar.resolve(f))
+                    .forEach(f -> classFiles.add(f));
+            }
+        }
+        return classFiles;
+    }
+
+    // for testing TODO: remove
+    public static void main (String[] args) throws IOException, URISyntaxException {
+        Path jarFolder = Path.of(args[0]);
+        Set<Path> jars = collectJars(jarFolder);
+        System.out.println("jars collected: " + jars.size());
+        Path jar = jars.iterator().next();
+        System.out.println("first jar: " + jar);
+        Set<Path> classes = collectClasses(jar);
+        System.out.println("classes collected: " + classes.size());
+
+        for (Path classFile:classes) {
+            System.out.println("\t"+classFile);
+        }
+
+    }
+
 
     /**
      * Organise / index jars in a map, the keys correspond to the GAV of the respective component, represented by file name.
