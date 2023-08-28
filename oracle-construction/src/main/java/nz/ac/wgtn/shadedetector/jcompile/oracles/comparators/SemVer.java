@@ -8,7 +8,6 @@ public class SemVer {
 
     static int[] parseSemVer(String version) {
         String[] tokens = version.split("\\.");
-        assert tokens.length>=3;
         int[] parts = new int[tokens.length];
         for (int i=0;i<tokens.length;i++) {
             parts[i] = Integer.parseInt(tokens[i]);
