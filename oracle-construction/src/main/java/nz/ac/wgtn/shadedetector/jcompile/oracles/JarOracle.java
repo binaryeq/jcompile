@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Computes a oracle for jar files.
+ * @author jens dietrich
  */
 public interface JarOracle {
     List<Pair<File,File>> build (File jarFolder) throws IOException ;
