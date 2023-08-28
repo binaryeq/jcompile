@@ -1,11 +1,10 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.OpenJDKVersionsComparator;
 import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.SemVerInJarFilenameComparator;
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +19,14 @@ import java.util.stream.Collectors;
 public class AdjacentVersionSameArtifactAndCompiler implements JarOracle {
 
     @Override
-    public List<Pair<File, File>> build(File jarFolder) throws IOException {
+    public List<Pair<Path, Path>> build(Path jarFolder) throws IOException {
 
-        Map<String,Set<File>> jarsByBuildAndComponent = Utils.collectJarsByComponentAndBuild(jarFolder);
-        List<Pair<File, File>> oracle = new ArrayList<>();
+        Map<String,Set<Path>> jarsByBuildAndComponent = Utils.collectJarsByComponentAndBuild(jarFolder);
+        List<Pair<Path, Path>> oracle = new ArrayList<>();
         SemVerInJarFilenameComparator comparator = new SemVerInJarFilenameComparator();
 
         for (String artifact:jarsByBuildAndComponent.keySet()) {
-            List<File> differentVersion = jarsByBuildAndComponent.get(artifact).stream()
+            List<Path> differentVersion = jarsByBuildAndComponent.get(artifact).stream()
                 .sorted(comparator)
                 .collect(Collectors.toList());
 
@@ -41,11 +40,11 @@ public class AdjacentVersionSameArtifactAndCompiler implements JarOracle {
 
     // for testing TODO: remove
     public static void main (String[] args) throws IOException {
-        File jarFolder = new File(args[0]);
-        List<Pair<File, File>> oracle = new AdjacentVersionSameArtifactAndCompiler().build(jarFolder) ;
-        for (Pair<File, File> pair:oracle) {
-            System.out.println(pair.getLeft().getAbsolutePath());
-            System.out.println(pair.getRight().getAbsolutePath());
+        Path jarFolder = Path.of(args[0]);
+        List<Pair<Path, Path>> oracle = new AdjacentVersionSameArtifactAndCompiler().build(jarFolder) ;
+        for (Pair<Path, Path> pair:oracle) {
+            System.out.println(pair.getLeft().toFile());
+            System.out.println(pair.getRight().toFile());
             System.out.println();
         }
         System.out.println("oracle size: " + oracle.size());

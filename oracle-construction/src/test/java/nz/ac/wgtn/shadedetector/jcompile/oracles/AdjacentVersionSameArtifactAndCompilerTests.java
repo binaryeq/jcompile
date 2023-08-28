@@ -4,11 +4,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
-
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.JARS;
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.pair;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AdjacentVersionSameArtifactAndCompilerTests {
 
-    private static List<Pair<File, File>> oracle = null;
+    private static List<Pair<Path, Path>> oracle = null;
 
     @BeforeAll
     public static void buildOracle () throws IOException {

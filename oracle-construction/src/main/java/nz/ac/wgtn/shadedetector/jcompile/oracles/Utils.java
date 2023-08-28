@@ -3,25 +3,29 @@ package nz.ac.wgtn.shadedetector.jcompile.oracles;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Reusable utilitiues.
+ * Reusable utilities.
  * @author jens dietrich
  */
 public class Utils {
 
 
-    public static final Function<File,String> COMPILER_USED = f -> f.getParentFile().getName();
-    public static final Function<File,String> COMPONENT_NAME = f -> f.getName().substring(0,f.getName().lastIndexOf("-"));
+    public static final Function<Path,String> COMPILER_USED = p -> p.getParent().getFileName().toString();
+    public static final Function<Path,String> COMPONENT_NAME = p -> {
+        String fileName = p.getFileName().toString();
+        return fileName.substring(0,fileName.lastIndexOf("-"));
+    };
+    public static final Function<Path,String> ARTIFACT = p -> p.getFileName().toString();
 
-    public static Set<File> collectJars(File jarFolder) throws IOException {
-        return Files.walk(jarFolder.toPath())
-            .map(p -> p.toFile())
-            .filter(f -> f.exists())
-            .filter(f -> f.getName().endsWith(".jar"))  // this excludes .jar.error !
+    public static Set<Path> collectJars(Path jarFolder) throws IOException {
+        return Files.walk(jarFolder)
+            .filter(Files::exists)
+            .filter(f -> f.getFileName().toString().endsWith(".jar"))  // this excludes .jar.error !
             .collect(Collectors.toSet());
     }
 
@@ -33,10 +37,10 @@ public class Utils {
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<File>> index(File jarFolder, Function<File,String> indexingFunction,Comparator<String> comparator) throws IOException {
-        Set<File> jars = collectJars(jarFolder);
-        Map<String,Set<File>> indexedJars = comparator==null ? new TreeMap<>() : new TreeMap<>(comparator);
-        for (File jar:jars) {
+    public static Map<String,Set<Path>> index(Path jarFolder, Function<Path,String> indexingFunction,Comparator<String> comparator) throws IOException {
+        Set<Path> jars = collectJars(jarFolder);
+        Map<String,Set<Path>> indexedJars = comparator==null ? new TreeMap<>() : new TreeMap<>(comparator);
+        for (Path jar:jars) {
             String key = indexingFunction.apply(jar);
             indexedJars.computeIfAbsent(key, k -> new TreeSet<>()).add(jar);
         }
@@ -50,7 +54,7 @@ public class Utils {
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<File>> index(File jarFolder, Function<File,String> indexingFunction) throws IOException {
+    public static Map<String,Set<Path>> index(Path jarFolder, Function<Path,String> indexingFunction) throws IOException {
         return index(jarFolder,indexingFunction,null);
     }
 
@@ -60,7 +64,7 @@ public class Utils {
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<File>> collectJarsByCompilerUsed(File jarFolder) throws IOException {
+    public static Map<String,Set<Path>> collectJarsByCompilerUsed(Path jarFolder) throws IOException {
         return index(jarFolder, COMPILER_USED);
     }
 
@@ -71,8 +75,8 @@ public class Utils {
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<File>> collectJarsByCompilerUsed(File jarFolder, Comparator<String> comparator) throws IOException {
-        return index(jarFolder, f -> f.getParentFile().getName(),comparator);
+    public static Map<String,Set<Path>> collectJarsByCompilerUsed(Path jarFolder, Comparator<String> comparator) throws IOException {
+        return index(jarFolder, COMPILER_USED,comparator);
     }
 
     /**
@@ -81,8 +85,8 @@ public class Utils {
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<File>> collectJarsByArtifact(File jarFolder) throws IOException {
-        return index(jarFolder, f -> f.getName());
+    public static Map<String,Set<Path>> collectJarsByArtifact(Path jarFolder) throws IOException {
+        return index(jarFolder, ARTIFACT);
     }
 
     /**
@@ -91,7 +95,7 @@ public class Utils {
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<File>> collectJarsByComponent(File jarFolder) throws IOException {
+    public static Map<String,Set<Path>> collectJarsByComponent(Path jarFolder) throws IOException {
         return index(jarFolder, COMPONENT_NAME);
     }
 
@@ -101,7 +105,7 @@ public class Utils {
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<File>> collectJarsByComponentAndBuild(File jarFolder) throws IOException {
+    public static Map<String,Set<Path>> collectJarsByComponentAndBuild(Path jarFolder) throws IOException {
         return index(jarFolder, f -> COMPILER_USED.apply(f) + "#" + COMPONENT_NAME.apply(f));
     }
 

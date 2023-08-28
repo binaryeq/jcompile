@@ -1,11 +1,9 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Print some statistics.
@@ -15,9 +13,9 @@ public class PrintStats {
 
     public static void main (String[] args) throws IOException {
 
-        File jarFolder = new File(args[0]);
-        Preconditions.checkArgument(jarFolder.exists());
-        Preconditions.checkArgument(jarFolder.isDirectory());
+        Path jarFolder = Path.of(args[0]);
+        Preconditions.checkArgument(Files.exists(jarFolder));
+        Preconditions.checkArgument(Files.isDirectory(jarFolder));
 
         int numberOfJars = Utils.collectJars(jarFolder).size();
         System.out.println("jars: " + numberOfJars);

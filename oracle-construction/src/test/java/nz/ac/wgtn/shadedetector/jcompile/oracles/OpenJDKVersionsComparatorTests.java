@@ -2,7 +2,6 @@ package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
 import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.OpenJDKVersionsComparator;
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OpenJDKVersionsComparatorTests {

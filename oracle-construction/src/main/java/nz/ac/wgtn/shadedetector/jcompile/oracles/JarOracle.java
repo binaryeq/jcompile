@@ -1,8 +1,8 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
 import org.apache.commons.lang3.tuple.Pair;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 /**
@@ -10,5 +10,5 @@ import java.util.List;
  * @author jens dietrich
  */
 public interface JarOracle {
-    List<Pair<File,File>> build (File jarFolder) throws IOException ;
+    List<Pair<Path,Path>> build (Path jarFolder) throws IOException ;
 }

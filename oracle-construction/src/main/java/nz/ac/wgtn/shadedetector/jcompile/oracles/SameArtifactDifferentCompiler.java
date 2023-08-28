@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,14 +19,14 @@ import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.index;
 public class SameArtifactDifferentCompiler implements JarOracle {
 
     @Override
-    public List<Pair<File, File>> build(File jarFolder) throws IOException {
+    public List<Pair<Path, Path>> build(Path jarFolder) throws IOException {
 
-        Map<String,Set<File>> jarsByArtifact = Utils.collectJarsByArtifact(jarFolder);
-        List<Pair<File, File>> oracle = new ArrayList<>();
+        Map<String,Set<Path>> jarsByArtifact = Utils.collectJarsByArtifact(jarFolder);
+        List<Pair<Path, Path>> oracle = new ArrayList<>();
         OpenJDKVersionsComparator versionComparator = new OpenJDKVersionsComparator();
 
         for (String artifact:jarsByArtifact.keySet()) {
-            List<File> jarsSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
+            List<Path> jarsSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
                 .sorted((f1,f2) -> versionComparator.compare(Utils.COMPILER_USED.apply(f1),Utils.COMPILER_USED.apply(f2)))
                 .collect(Collectors.toList());
 
@@ -40,11 +41,11 @@ public class SameArtifactDifferentCompiler implements JarOracle {
 
     // for testing TODO: remove
     public static void main (String[] args) throws IOException {
-        File jarFolder = new File(args[0]);
-        List<Pair<File, File>> oracle = new SameArtifactDifferentCompiler().build(jarFolder) ;
-        for (Pair<File, File> pair:oracle) {
-            System.out.println(pair.getLeft().getAbsolutePath());
-            System.out.println(pair.getRight().getAbsolutePath());
+        Path jarFolder = Path.of(args[0]);
+        List<Pair<Path, Path>> oracle = new SameArtifactDifferentCompiler().build(jarFolder) ;
+        for (Pair<Path, Path> pair:oracle) {
+            System.out.println(pair.getLeft().toFile());
+            System.out.println(pair.getRight().toFile());
             System.out.println();
         }
         System.out.println("oracle size: " + oracle.size());
