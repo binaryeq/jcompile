@@ -24,7 +24,7 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     }
 
     public SameArtifactDifferentCompilerClassOracle() {
-        super(false,false);
+        super(true,false);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     //    // for testing TODO: remove
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
-        List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle(true,true).build(jarFolder);
+        List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
         System.out.println("oracle size: " + oracle.size());
     }
 

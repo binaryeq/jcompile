@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.isAnonymousInnerClass;
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.isPackageInfo;
 
@@ -39,7 +38,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
         if (!includePackageInfo && isPackageInfo(p)) {
             return false;
         }
-        if (!includeAnonymousInnerClasses() && isAnonymousInnerClass(p)) {
+        if (!includeAnonymousInnerClasses && isAnonymousInnerClass(p)) {
             return false;
         }
         return true;
