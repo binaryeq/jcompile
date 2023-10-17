@@ -16,7 +16,7 @@ TAG=$5
 RESULT_ROOT_FOLDER=$6
 
 # Make the container name unique to each process to enable parallel builds
-DOCKER_CONTAINER="$DOCKER_CONTAINER_BASENAME.$$"
+DOCKER_CONTAINER="${DOCKER_CONTAINER_BASENAME}__pid$$"
 
 TMP_LOG="build.$$.log"
 
