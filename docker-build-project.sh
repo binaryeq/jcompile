@@ -64,7 +64,7 @@ MAVEN_CONTAINER="/apache-maven"
 
 echo "using data folder ${DATASET_HOST}"
 
-MAVEN_CACHE_HOST="$(pwd)/.m2"
+MAVEN_CACHE_HOST=~/.m2
 MAVEN_CACHE_CONTAINER="/maven-cache"
 
 PROJECT2BUILD=${DATASET_CONTAINER}/${PROJECT}
