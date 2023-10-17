@@ -2,7 +2,8 @@
 
 # Build a given mvn project using a Java compiler provided by a docker container. 
 # Maven is provided by the host to ensure consistency, and the creation of further images. 
-# The Maven cache (.m2) is also provided by the host for performance.
+# For performance, the Maven cache is also provided by the host at $(pwd)/.m2 and shared across
+# runs; you can override its location by setting MAVEN_CACHE_HOST in the environment.
 # @author jens dietrich
 
 DOCKER_IMAGE=$1
@@ -64,7 +65,8 @@ MAVEN_CONTAINER="/apache-maven"
 
 echo "using data folder ${DATASET_HOST}"
 
-MAVEN_CACHE_HOST=~/.m2
+MAVEN_CACHE_HOST=${MAVEN_CACHE_HOST:-$(pwd)/.m2}     # Default to $(pwd)/.m2 unless env var already set
+echo "using Maven cache dir ${MAVEN_CACHE_HOST}"
 MAVEN_CACHE_CONTAINER="/maven-cache"
 
 PROJECT2BUILD=${DATASET_CONTAINER}/${PROJECT}
