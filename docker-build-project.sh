@@ -99,7 +99,6 @@ echo ""
 if test -f "${DATASET_HOST}/${PROJECT}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
 	cp ${DATASET_HOST}/${PROJECT}/target/${JAR_NAME} ${RESULT_FOLDER}
-	docker stop $DOCKER_CONTAINER
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
