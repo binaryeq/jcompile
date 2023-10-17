@@ -88,6 +88,7 @@ docker run \
 	--volume ${MAVEN_CACHE_HOST}:${MAVEN_CACHE_CONTAINER} \
 	--volume ${MAVEN_HOST}:${MAVEN_CONTAINER} \
 	--workdir $PROJECT2BUILD \
+	--user $(id -u):$(id -g) \
 	--name $DOCKER_CONTAINER $DOCKER_IMAGE \
 
 echo "building project"
