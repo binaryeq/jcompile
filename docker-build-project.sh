@@ -7,7 +7,7 @@
 # @author jens dietrich
 
 DOCKER_IMAGE=$1
-DOCKER_CONTAINER=$2
+DOCKER_CONTAINER_BASENAME=$2
 PROJECT=$3
 # needed for caching
 JAR_NAME=$4
@@ -15,21 +15,26 @@ TAG=$5
 # result destination
 RESULT_ROOT_FOLDER=$6
 
+# Make the container name unique to each process to enable parallel builds
+DOCKER_CONTAINER="${DOCKER_CONTAINER_BASENAME}__pid$$"
+
+TMP_LOG="build.$$.log"
+
+RESULT_FOLDER=${RESULT_ROOT_FOLDER}/${DOCKER_CONTAINER_BASENAME}
+RESULT_FILE=${RESULT_FOLDER}/${JAR_NAME}
+RESULT_ERROR_LOG=${RESULT_FOLDER}/${JAR_NAME}".error"
+
 echo "docker image: ${DOCKER_IMAGE}"
+echo "docker container basename: ${DOCKER_CONTAINER_BASENAME}"
 echo "docker container name: ${DOCKER_CONTAINER}"
 echo "project name: ${PROJECT}"
 echo "project jar to be generated: ${JAR_NAME}"
 echo "project tag: ${TAG}"
 echo "result root folder: ${RESULT_ROOT_FOLDER}"
+echo "result folder: ${RESULT_FOLDER}"
 echo ""
 
 
-
-TMP_LOG="build.log"
-
-RESULT_FOLDER=${RESULT_ROOT_FOLDER}/${DOCKER_CONTAINER}
-RESULT_FILE=${RESULT_FOLDER}/${JAR_NAME}
-RESULT_ERROR_LOG=${RESULT_FOLDER}/${JAR_NAME}".error"
 
 if test -f "${RESULT_FILE}"; then
 	echo ""
@@ -99,7 +104,6 @@ echo ""
 if test -f "${DATASET_HOST}/${PROJECT}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
 	cp ${DATASET_HOST}/${PROJECT}/target/${JAR_NAME} ${RESULT_FOLDER}
-	docker stop $DOCKER_CONTAINER
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
