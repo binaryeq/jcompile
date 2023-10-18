@@ -3,3 +3,5 @@ jars
 repeated
 sources
 oracle-construction/target
+dataset/
+build.*.log
