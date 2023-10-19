@@ -112,7 +112,7 @@ fi
 docker stop $DOCKER_CONTAINER
 docker rm $DOCKER_CONTAINER  # to avoid container with this name already in use
 
-git worktree remove -f "${WORKTREE_HOST}"
+git -C "${DATASET_HOST}/${PROJECT}" worktree remove -f "${WORKTREE_HOST}"
 
 # for useability in batch scripts
 echo ""
