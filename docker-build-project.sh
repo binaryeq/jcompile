@@ -23,6 +23,8 @@ TMP_LOG="build.$$.log"
 RESULT_FOLDER=${RESULT_ROOT_FOLDER}/${DOCKER_CONTAINER_BASENAME}
 RESULT_FILE=${RESULT_FOLDER}/${JAR_NAME}
 RESULT_ERROR_LOG=${RESULT_FOLDER}/${JAR_NAME}".error"
+JAR_BASENAME="${JAR_NAME%%.jar}"
+WORKTREE_HOST="$(pwd)/worktrees/pid$$-$JAR_BASENAME"
 
 echo "docker image: ${DOCKER_IMAGE}"
 echo "docker container basename: ${DOCKER_CONTAINER_BASENAME}"
@@ -32,6 +34,7 @@ echo "project jar to be generated: ${JAR_NAME}"
 echo "project tag: ${TAG}"
 echo "result root folder: ${RESULT_ROOT_FOLDER}"
 echo "result folder: ${RESULT_FOLDER}"
+echo "host worktree: ${WORKTREE_HOST}"
 echo ""
 
 
@@ -62,8 +65,9 @@ mkdir -p ${RESULT_FOLDER}
 DATASET_HOST="$(pwd)/dataset"
 DATASET_CONTAINER="/dataset"
 
-echo "checking out tag ${TAG}"
-git -C ${DATASET_HOST}/${PROJECT} checkout tags/${TAG}
+echo "checking out tag ${TAG} to ${WORKTREE_HOST}"
+mkdir -p $(dirname "${WORKTREE_HOST}")
+git -C "${DATASET_HOST}/${PROJECT}" worktree add --detach "${WORKTREE_HOST}" "tags/${TAG}"
 
 MAVEN_HOST="$(pwd)/apache-maven-3.9.2"
 MAVEN_CONTAINER="/apache-maven"
@@ -74,12 +78,8 @@ MAVEN_CACHE_HOST=${MAVEN_CACHE_HOST:-$(pwd)/.m2}     # Default to $(pwd)/.m2 unl
 echo "using Maven cache dir ${MAVEN_CACHE_HOST}"
 MAVEN_CACHE_CONTAINER="/maven-cache"
 
-PROJECT2BUILD=${DATASET_CONTAINER}/${PROJECT}
+PROJECT2BUILD=${DATASET_CONTAINER}
 
-
-# clear old build from outside the container -- otherwise, when the container build fails,
-# old jars might be copied over
-mvn clean -f ${DATASET_HOST}/${PROJECT}/pom.xml
 
 # run docker image from hub with java and mvn
 # share & reuse maven cache for performance
@@ -89,7 +89,7 @@ docker pull $DOCKER_IMAGE
 #docker start $DOCKER_CONTAINER
 docker run \
 	-dit \
-	--volume ${DATASET_HOST}:${DATASET_CONTAINER} \
+	--volume ${WORKTREE_HOST}:${DATASET_CONTAINER} \
 	--volume ${MAVEN_CACHE_HOST}:${MAVEN_CACHE_CONTAINER} \
 	--volume ${MAVEN_HOST}:${MAVEN_CONTAINER} \
 	--workdir $PROJECT2BUILD \
@@ -101,9 +101,9 @@ docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=
 
 
 echo ""
-if test -f "${DATASET_HOST}/${PROJECT}/target/${JAR_NAME}"; then
+if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
-	cp ${DATASET_HOST}/${PROJECT}/target/${JAR_NAME} ${RESULT_FOLDER}
+	cp ${WORKTREE_HOST}/target/${JAR_NAME} ${RESULT_FOLDER}
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
@@ -111,6 +111,8 @@ fi
 
 docker stop $DOCKER_CONTAINER
 docker rm $DOCKER_CONTAINER  # to avoid container with this name already in use
+
+git -C "${DATASET_HOST}/${PROJECT}" worktree remove -f "${WORKTREE_HOST}"
 
 # for useability in batch scripts
 echo ""
