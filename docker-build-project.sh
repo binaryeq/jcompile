@@ -67,7 +67,8 @@ DATASET_CONTAINER="/dataset"
 
 echo "checking out tag ${TAG} to ${WORKTREE_HOST}"
 mkdir -p $(dirname "${WORKTREE_HOST}")
-git -C "${DATASET_HOST}/${PROJECT}" worktree add --detach "${WORKTREE_HOST}" "tags/${TAG}"
+# Need umask to make all dirs writable by high-valued docker uid if --userns-remap is in force
+( umask 0; git -C "${DATASET_HOST}/${PROJECT}" worktree add --detach "${WORKTREE_HOST}" "tags/${TAG}" )
 
 MAVEN_HOST="$(pwd)/apache-maven-3.9.2"
 MAVEN_CONTAINER="/apache-maven"
@@ -97,7 +98,8 @@ docker run \
 	--name $DOCKER_CONTAINER $DOCKER_IMAGE \
 
 echo "building project"
-docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package  | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
+# Need umask to make all dirs created by high-value docker uid deleteable by us afterwards if --userns-remap is in force
+docker exec -it $DOCKER_CONTAINER sh -c "umask 0; ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package"  | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
 
 
 echo ""
