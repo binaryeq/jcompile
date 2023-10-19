@@ -81,10 +81,6 @@ MAVEN_CACHE_CONTAINER="/maven-cache"
 PROJECT2BUILD=${DATASET_CONTAINER}
 
 
-# clear old build from outside the container -- otherwise, when the container build fails,
-# old jars might be copied over
-mvn clean -f ${DATASET_HOST}/${PROJECT}/pom.xml
-
 # run docker image from hub with java and mvn
 # share & reuse maven cache for performance
 
@@ -105,9 +101,9 @@ docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=
 
 
 echo ""
-if test -f "${DATASET_HOST}/${PROJECT}/target/${JAR_NAME}"; then
+if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
-	cp ${DATASET_HOST}/${PROJECT}/target/${JAR_NAME} ${RESULT_FOLDER}
+	cp ${WORKTREE_HOST}/target/${JAR_NAME} ${RESULT_FOLDER}
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
@@ -116,7 +112,7 @@ fi
 docker stop $DOCKER_CONTAINER
 docker rm $DOCKER_CONTAINER  # to avoid container with this name already in use
 
-git worktree remove "${WORKTREE_HOST}"
+git worktree remove -f "${WORKTREE_HOST}"
 
 # for useability in batch scripts
 echo ""
