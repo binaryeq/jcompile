@@ -98,8 +98,10 @@ docker run \
 	--name $DOCKER_CONTAINER $DOCKER_IMAGE \
 
 echo "building project"
-# Need umask to make all dirs created by high-value docker uid deleteable by us afterwards if --userns-remap is in force
-docker exec -it $DOCKER_CONTAINER sh -c "umask 0; ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package"  | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
+docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
+# Some projects make files with restricted perms even if umask 0 is in force, and if --userns-remap is in force we otherwise wouldn't be able to delete them on the host afterwards.
+# Ignore "permission denied" on the top-level dir as it's owned by the host uid -- easier than trying to use wildcards to correctly get dotfiles and dotdirs.
+docker exec -it $DOCKER_CONTAINER chmod -R a+rwX .
 
 
 echo ""
