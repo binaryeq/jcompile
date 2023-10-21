@@ -195,11 +195,6 @@
 	},
 	{
 		"name":"commons-bcel",
-		"tag":"rel/commons-bcel-6.7.0",
-		"jar":"bcel-6.7.0.jar"
-	},
-	{
-		"name":"commons-bcel",
 		"tag":"rel/commons-bcel-6.6.1",
 		"jar":"bcel-6.6.1.jar"
 	},
