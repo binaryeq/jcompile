@@ -10,6 +10,12 @@ projects=`cat dataset.json`
 #projects=`cat dataset-debug.json`
 
 
+ECHO_IF_DRY_RUN=
+if [ "$1" = "--dry-run" ]
+then
+	ECHO_IF_DRY_RUN=echo
+fi
+
 # root result folders
 JARS="jars"
 for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
@@ -37,7 +43,7 @@ for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
    		#echo "\tproject jar: ${PROJECT_JAR}"
    		#echo ""
 
-   		sh ./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS}
+   		$ECHO_IF_DRY_RUN sh ./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS}
 	done
 	echo "-------------------------------------"
 
