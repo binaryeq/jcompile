@@ -62,7 +62,7 @@
 	},
 	{
 		"image":"eclipse-temurin:20.0.1_9-jdk",
-		"name":"openjdk-19.0.2"
+		"name":"openjdk-20.0.1"
 	}
 
 ]
