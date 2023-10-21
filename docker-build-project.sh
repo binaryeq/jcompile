@@ -88,19 +88,18 @@ PROJECT2BUILD=${DATASET_CONTAINER}
 #docker stop $DOCKER_CONTAINER
 docker pull $DOCKER_IMAGE
 #docker start $DOCKER_CONTAINER
+# We no longer use '--user $(id -u):$(id -g)' since if --userns-remap is in force, that winds up creating restricted-perm files
+# under . at random intervals which we can't clean up from the host. See https://github.com/binaryeq/jcompile/pull/10#issuecomment-1771989895
 docker run \
 	-dit \
 	--volume ${WORKTREE_HOST}:${DATASET_CONTAINER} \
 	--volume ${MAVEN_CACHE_HOST}:${MAVEN_CACHE_CONTAINER} \
 	--volume ${MAVEN_HOST}:${MAVEN_CONTAINER} \
 	--workdir $PROJECT2BUILD \
-	--user $(id -u):$(id -g) \
 	--name $DOCKER_CONTAINER $DOCKER_IMAGE \
 
 echo "building project"
 docker exec -it $DOCKER_CONTAINER ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
-# Some files are written slightly later (see https://github.com/binaryeq/jcompile/pull/10#issuecomment-1771989895). Wait for them before chmodding.
-sleep 3
 # Some projects make files with restricted perms even if umask 0 is in force, and if --userns-remap is in force we otherwise wouldn't be able to delete them on the host afterwards.
 # Ignore "permission denied" on the top-level dir as it's owned by the host uid -- easier than trying to use wildcards to correctly get dotfiles and dotdirs.
 docker exec -it $DOCKER_CONTAINER chmod -R a+rwX .
