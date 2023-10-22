@@ -5,3 +5,4 @@ sources
 oracle-construction/target
 dataset/
 build.*.log
+generated_rules_for_all_jars.mk
