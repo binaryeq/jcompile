@@ -66,8 +66,8 @@
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
-		"name":"ecj-3.12.3_openjdk-11.0.19",
-		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.2"
+		"name":"ecj-3.11.1.v20150902-1521_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.1"
 	}
 
 ]
