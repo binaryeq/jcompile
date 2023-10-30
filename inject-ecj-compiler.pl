@@ -1,7 +1,9 @@
 #!/usr/bin/perl -i.bak
 
-# Usage: inject-ecj-compiler <plexus-compiler-eclipse-version> pom.xml
+# Usage: inject-ecj-compiler <plexus-compiler-eclipse-version> path/to/pom.xml
+#        inject-ecj-compiler <plexus-compiler-eclipse-version> path/to/dir-with-pom
 #
+# In the second case, where the argument is a directory, "/pom.xml" will be auto-appended.
 # pom.xml will be *replaced*, with the old version backed up to pom.xml.bak.
 
 use strict;
@@ -10,6 +12,13 @@ use warnings;
 my $v = shift;
 my $inBuild = 0;
 my $success = 0;
+
+print STDERR "ARGV: ", join(',', @ARGV), "\n";
+die "Must specify pom.xml or path to it!" if !@ARGV;
+if (-d $ARGV[0]) {
+	print STDERR "Auto-appending /pom.xml to dir path $ARGV[0]\n";
+	$ARGV[0] .= '/pom.xml';		# Simplifies running from build-docker-project.sh
+}
 
 while (<>) {
 	print;

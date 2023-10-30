@@ -14,6 +14,7 @@ JAR_NAME=$4
 TAG=$5
 # result destination
 RESULT_ROOT_FOLDER=$6
+PREP_WORKTREE_CMD="$7"
 
 # Make the container name unique to each process to enable parallel builds
 DOCKER_CONTAINER="${DOCKER_CONTAINER_BASENAME}__pid$$"
@@ -69,6 +70,11 @@ echo "checking out tag ${TAG} to ${WORKTREE_HOST}"
 mkdir -p $(dirname "${WORKTREE_HOST}")
 # Need umask to make all dirs writable by high-valued docker uid if --userns-remap is in force
 ( umask 0; git -C "${DATASET_HOST}/${PROJECT}" worktree add --detach "${WORKTREE_HOST}" "tags/${TAG}" )
+
+if test -n "$PREP_WORKTREE_CMD"; then
+	#( umask 0; cd "$WORKTREE_HOST"; $PREP_WORKTREE_CMD )
+	( umask 0; $PREP_WORKTREE_CMD "$WORKTREE_HOST" )
+fi
 
 MAVEN_HOST="$(pwd)/apache-maven-3.9.2"
 MAVEN_CONTAINER="/apache-maven"
