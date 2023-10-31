@@ -6,6 +6,6 @@ case "$1" in
 		;;
 
 	JEP280)
-		javap -c -v "$2" | grep -q -E '// InvokeDynamic #0:makeConcatWithConstants:\(Ljava/lang/String;Ljava/lang/String;\)Ljava/lang/String;$'
+		javap -c -v "$2" | grep -q -E '^ *#[0-9]+ = Class +#[0-9]+ +// java/lang/invoke/StringConcatFactory$'
 		;;
 esac
