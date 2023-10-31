@@ -42,6 +42,16 @@ while (<>) {
             <artifactId>plexus-compiler-eclipse</artifactId>
             <version>$v</version>
           </dependency>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-api</artifactId>
+            <version>$v</version>
+          </dependency>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-compiler-manager</artifactId>
+            <version>$v</version>
+          </dependency>
         </dependencies>
       </plugin>
 
