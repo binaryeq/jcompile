@@ -63,6 +63,45 @@
 	{
 		"image":"eclipse-temurin:20.0.1_9-jdk",
 		"name":"openjdk-20.0.1"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.11.1.v20150902-1521_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.1"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.12.3_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.2"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.15.1_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.6"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.24.0_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.9.0"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.28.0_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.11.1"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.29.0_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.12.0"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.30.0_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.12.1"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"ecj-3.32.0_openjdk-11.0.19",
+		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.13.0"
 	}
-
 ]
