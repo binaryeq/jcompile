@@ -10,7 +10,7 @@
 # ALL_JAR_DONES is not filled out until after the include, but make takes the first goal as the default.
 all: all_defined_after_include
 
-generated_rules_for_all_jars.mk: dataset.json java-compilers.json
+generated_rules_for_all_jars.mk: dataset.json java-compilers.json docker-build-all.sh
 	echo "Regenerating make rules in $@ from $^..."
 	./docker-build-all.sh --output-make-rules > $@
 

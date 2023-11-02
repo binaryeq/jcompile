@@ -53,6 +53,8 @@ for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
 		if [ $FOR_MAKE = 1 ]
 		then
 			echo "ALL_JAR_DONES += $JARS/$CONTAINER_NAME/$PROJECT_JAR.done"
+			echo "ALL_PROJECT_$PROJECT_NAME: $JARS/$CONTAINER_NAME/$PROJECT_JAR.done"
+			echo "ALL_COMPILER_$CONTAINER_NAME: $JARS/$CONTAINER_NAME/$PROJECT_JAR.done"
 			echo "$JARS/$CONTAINER_NAME/$PROJECT_JAR.done:"
 			/usr/bin/echo -e '\t'./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS} "'$PREP_WORKTREE_CMD'" '&& touch $@'
 			echo
