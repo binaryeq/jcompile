@@ -4,6 +4,7 @@
 # Maven is provided by the host to ensure consistency, and the creation of further images. 
 # For performance, the Maven cache is also provided by the host at $(pwd)/.m2 and shared across
 # runs; you can override its location by setting MAVEN_CACHE_HOST in the environment.
+# As a debugging aid, setting the env var STOP_BEFORE to certain values will stop the script at certain points.
 # @author jens dietrich
 
 DOCKER_IMAGE=$1
@@ -96,6 +97,7 @@ docker pull $DOCKER_IMAGE
 #docker start $DOCKER_CONTAINER
 # We no longer use '--user $(id -u):$(id -g)' since if --userns-remap is in force, that winds up creating restricted-perm files
 # under . at random intervals which we can't clean up from the host. See https://github.com/binaryeq/jcompile/pull/10#issuecomment-1771989895
+[ "$STOP_BEFORE" = "docker-run" ] && exit
 docker run \
 	-dt \
 	--volume ${WORKTREE_HOST}:${DATASET_CONTAINER} \
@@ -107,13 +109,16 @@ docker run \
 echo "building project"
 # "docker exec -it" fails if stdin is not a terminal, e.g., when running in the background
 # "umask 0" to make downloaded artifacts, which will be saved in the shared cache as root, can be modified/deleted from the host. "exec" to keep mvn as pid 1, important for docker signal handling.
+[ "$STOP_BEFORE" = "mvn" ] && exit
 docker exec -t $DOCKER_CONTAINER sh -c "umask 0; exec ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
 # Some projects make files with restricted perms even if umask 0 is in force, and if --userns-remap is in force we otherwise wouldn't be able to delete them on the host afterwards.
 # Ignore "permission denied" on the top-level dir as it's owned by the host uid -- easier than trying to use wildcards to correctly get dotfiles and dotdirs.
+[ "$STOP_BEFORE" = "chmod" ] && exit
 docker exec -t $DOCKER_CONTAINER chmod -R a+rwX .
 
 
 echo ""
+[ "$STOP_BEFORE" = "cp" ] && exit
 if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
 	cp ${WORKTREE_HOST}/target/${JAR_NAME} ${RESULT_FOLDER}
@@ -122,9 +127,11 @@ else
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
 fi
 
+[ "$STOP_BEFORE" = "docker-stop" ] && exit
 docker stop $DOCKER_CONTAINER
 docker rm $DOCKER_CONTAINER  # to avoid container with this name already in use
 
+[ "$STOP_BEFORE" = "remove-worktree" ] && exit
 git -C "${DATASET_HOST}/${PROJECT}" worktree remove -f "${WORKTREE_HOST}"
 
 # for useability in batch scripts
