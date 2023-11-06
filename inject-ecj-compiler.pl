@@ -27,33 +27,34 @@ while (<>) {
 		$inBuild = ($1 ne '/');
 	}
 
-	if ($inBuild && /\A\s*<plugins>\s*\z/) {
+	if ($inBuild && /\A(\s*)<plugins>\s*\z/) {
+		# Some projects will refuse to build if the indentation is wrong!
 		print <<THE_END;
-      <!-- Following plugin added automatically by $0, based on https://stackoverflow.com/a/33165304/47984 -->
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.0</version>
-        <configuration>
-          <compilerId>eclipse</compilerId>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-compiler-eclipse</artifactId>
-            <version>$v</version>
-          </dependency>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-compiler-api</artifactId>
-            <version>$v</version>
-          </dependency>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-compiler-manager</artifactId>
-            <version>$v</version>
-          </dependency>
-        </dependencies>
-      </plugin>
+$1  <!-- Following plugin added automatically by $0, based on https://stackoverflow.com/a/33165304/47984 -->
+$1  <plugin>
+$1    <artifactId>maven-compiler-plugin</artifactId>
+$1    <version>3.6.0</version>
+$1    <configuration>
+$1      <compilerId>eclipse</compilerId>
+$1    </configuration>
+$1    <dependencies>
+$1      <dependency>
+$1        <groupId>org.codehaus.plexus</groupId>
+$1        <artifactId>plexus-compiler-eclipse</artifactId>
+$1        <version>$v</version>
+$1      </dependency>
+$1      <dependency>
+$1        <groupId>org.codehaus.plexus</groupId>
+$1        <artifactId>plexus-compiler-api</artifactId>
+$1        <version>$v</version>
+$1      </dependency>
+$1      <dependency>
+$1        <groupId>org.codehaus.plexus</groupId>
+$1        <artifactId>plexus-compiler-manager</artifactId>
+$1        <version>$v</version>
+$1      </dependency>
+$1    </dependencies>
+$1  </plugin>
 
 THE_END
 		$success = 1;
