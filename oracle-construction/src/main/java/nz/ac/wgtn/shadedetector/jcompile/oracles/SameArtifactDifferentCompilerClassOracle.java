@@ -34,26 +34,37 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
         List<Pair<ZipPath, ZipPath>> classOracle = new ArrayList<>();
 
         for (Pair<Path,Path> jars:jarOracle) {
-            System.out.println("analysing: " + jars.getLeft().toString());
+            System.err.println("analysing: " + jars.getLeft().toString());
             Set<Path> classes1 = getClasses(jars.getLeft());
             Set<Path> classes2 = getClasses(jars.getRight());
             Set<Path> commonClasses = findCommonPaths(classes1,classes2);
             for (Path commonClass:commonClasses) {
                 ZipPath zpath1 = new ZipPath(jars.getLeft(),commonClass);
                 ZipPath zpath2 = new ZipPath(jars.getRight(),commonClass);
-                classOracle.add(Pair.of(zpath1, zpath2));
+                if (include(zpath1, zpath2)) {
+                    classOracle.add(Pair.of(zpath1, zpath2));
+                }
             }
         }
 
         return classOracle;
     }
 
+    private boolean include(ZipPath zpath1, ZipPath zpath2) throws IOException, URISyntaxException {
+        assert ! zpath1.outerPath().toString().equals(zpath2.outerPath().toString()) ;
+        byte[] content1 = read(zpath1);
+        byte[] content2 = read(zpath2);
+        return !Arrays.equals(content1,content2);
+    }
 
     //    // for testing TODO: remove
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
         List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
-        System.out.println("oracle size: " + oracle.size());
+        System.out.println("container1\tcontainer2\tclass1\tclass2");
+        for (Pair<ZipPath, ZipPath> paths : oracle) {
+            System.out.println(paths.getLeft().outerPath() + "\t" + paths.getRight().outerPath() + "\t" + paths.getLeft().innerPath() + "\t" + paths.getRight().innerPath());
+        }
     }
 
 }
