@@ -17,8 +17,13 @@ public class OpenJDKVersionsComparatorTests {
     }
 
     @Test
-    public void testBadInput3() {
-        assertThrows(IllegalArgumentException.class, () -> new OpenJDKVersionsComparator().compare("otherjdk-1.2.3","openjdk-1.2.3"));
+    public void testDiffLineage1() {
+        assertTrue(0 > new OpenJDKVersionsComparator().compare("ecj-1.2.3","openjdk-1.2.3"));
+    }
+
+    @Test
+    public void testDiffLineage2() {
+        assertTrue(0 < new OpenJDKVersionsComparator().compare("z-1.2.3","openjdk-1.2.3"));
     }
 
 
