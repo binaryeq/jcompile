@@ -18,7 +18,6 @@ public class ProjectToJDKMajorVersion implements UnaryOperator<String> {
             // Keep stripping period-delimited components until we find a match
             Map<String, String> jdkMajorVersionMap = getJdkMajorVersionMap();
             while (!jdkMajorVersionMap.containsKey(ecjVersion)) {
-                System.err.println("Failed to find " + ecjVersion);
                 int period = ecjVersion.lastIndexOf('.');
                 if (period == -1) {
                     throw new RuntimeException("Could not find JDK major version for ECJ compiler name '" + compilerName + "' (final attempt: '" + ecjVersion + "')");
@@ -52,7 +51,6 @@ public class ProjectToJDKMajorVersion implements UnaryOperator<String> {
                 if (!line.startsWith("eclipse_release\t")) {              // Skip header line
                     String[] fields = line.trim().split("\t");      // Eclipse release, ECJ Compiler version, Max supported major JDK version
                     map.put(fields[1], fields[2]);
-                    System.err.println("Added " + fields[1] + " -> " + fields[2]);      //DEBUG
                 }
             }
 
