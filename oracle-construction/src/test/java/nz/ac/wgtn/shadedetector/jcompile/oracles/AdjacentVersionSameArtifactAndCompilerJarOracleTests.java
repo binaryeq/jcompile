@@ -12,7 +12,7 @@ import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.pair;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AdjacentVersionSameArtifactAndCompilerJarOracleTest {
+public class AdjacentVersionSameArtifactAndCompilerJarOracleTests {
 
     private static List<Pair<Path, Path>> oracle = null;
 
