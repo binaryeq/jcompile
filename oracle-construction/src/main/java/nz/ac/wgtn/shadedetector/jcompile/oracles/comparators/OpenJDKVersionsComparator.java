@@ -34,7 +34,7 @@ public class OpenJDKVersionsComparator implements Comparator<String> {
     public static String[] getLineageAndSemVer(String compilerName) {
         Matcher m = OPENJDK_SEMVER_REGEX.matcher(compilerName);
         if (m.find()) {
-            return new String[] { m.group(0), m.group(1) };
+            return new String[] { m.group(1), m.group(2) };
         } else {
             throw new IllegalArgumentException("'" + compilerName + "' does not match " + OPENJDK_SEMVER);
         }
