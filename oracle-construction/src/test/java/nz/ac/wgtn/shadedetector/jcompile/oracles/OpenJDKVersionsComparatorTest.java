@@ -4,7 +4,7 @@ import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.OpenJDKVersionsComp
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class OpenJDKVersionsComparatorTests {
+public class OpenJDKVersionsComparatorTest {
 
     @Test
     public void testBadInput1() {
