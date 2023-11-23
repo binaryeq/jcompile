@@ -1,9 +1,6 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles.comparators;
 
-import com.google.common.base.Preconditions;
-
 import java.util.Comparator;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,24 +14,30 @@ public class OpenJDKVersionsComparator implements Comparator<String> {
 
     @Override
     public int compare(String o1, String o2) {
-        Matcher m1 = OPENJDK_SEMVER_REGEX.matcher(o1);
-        Matcher m2 = OPENJDK_SEMVER_REGEX.matcher(o2);
-        if (m1.find() && m2.find()) {
-            int lineageDiff = m1.group(0).compareTo(m2.group(0));
-            if (lineageDiff != 0) {
-                return lineageDiff;      // Compiler lineages differ
-            }
-        } else {
-            throw new IllegalArgumentException("One of the operands did not match " + OPENJDK_SEMVER);
+        String[] lineageAndSemVer1 = getLineageAndSemVer(o1);
+        String[] lineageAndSemVer2 = getLineageAndSemVer(o2);
+
+        int lineageDiff = lineageAndSemVer1[0].compareTo(lineageAndSemVer2[0]);
+        if (lineageDiff != 0) {
+            return lineageDiff;
         }
 
-        String version1 = m1.group(1);
-        String version2 = m2.group(1);
-
-        int[] semver1 = parseSemVer(version1);
-        int[] semver2 = parseSemVer(version2);
+        int[] semver1 = parseSemVer(lineageAndSemVer1[1]);
+        int[] semver2 = parseSemVer(lineageAndSemVer2[1]);
 
         return compareSemVer(semver1,semver2);
+    }
+
+    /**
+     * @return array containing compiler lineage name as the first element, semver as the second element
+     */
+    public static String[] getLineageAndSemVer(String compilerName) {
+        Matcher m = OPENJDK_SEMVER_REGEX.matcher(compilerName);
+        if (m.find()) {
+            return new String[] { m.group(0), m.group(1) };
+        } else {
+            throw new IllegalArgumentException("'" + compilerName + "' does not match " + OPENJDK_SEMVER);
+        }
     }
 
 

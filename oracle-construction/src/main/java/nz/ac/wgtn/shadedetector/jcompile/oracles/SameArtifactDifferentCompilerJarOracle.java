@@ -25,13 +25,18 @@ public class SameArtifactDifferentCompilerJarOracle implements JarOracle {
         OpenJDKVersionsComparator versionComparator = new OpenJDKVersionsComparator();
 
         for (String artifact:jarsByArtifact.keySet()) {
-            List<Path> jarsSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
+            Map<String, List<Path>> jarsGroupedByCompilerLineageSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
                 .sorted((f1,f2) -> versionComparator.compare(Utils.COMPILER_USED.apply(f1),Utils.COMPILER_USED.apply(f2)))
-                .collect(Collectors.toList());
+                .collect(Collectors.groupingBy(f1 -> OpenJDKVersionsComparator.getLineageAndSemVer(Utils.COMPILER_USED.apply(f1))[0]));
 
-            // instead of using all combinations, only use adjacent pairs
-            for (int i=1;i<jarsSortedByCompilerVersion.size();i++) {
-                oracle.add(Pair.of(jarsSortedByCompilerVersion.get(i-1),jarsSortedByCompilerVersion.get(i)));
+            for (String lineage : jarsGroupedByCompilerLineageSortedByCompilerVersion.keySet()) {
+                System.err.println("Processing lineage " + lineage + " for artifact " + artifact);      //DEBUG
+                List<Path> jarsForLineage = jarsGroupedByCompilerLineageSortedByCompilerVersion.get(lineage);
+
+                // instead of using all combinations, only use adjacent pairs from the same compiler lineage
+                for (int i = 1; i < jarsForLineage.size(); i++) {
+                    oracle.add(Pair.of(jarsForLineage.get(i - 1), jarsForLineage.get(i)));
+                }
             }
         }
 
