@@ -12,7 +12,7 @@ import static nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.SemVer.parse
 
 public class OpenJDKVersionsComparator implements Comparator<String> {
 
-    public static final String OPENJDK_SEMVER = "^(openjdk|ecj)-(\\d+\\.\\d+\\.\\d+)";
+    public static final String OPENJDK_SEMVER = "^([^\\.]+)-(\\d+\\.\\d+\\.\\d+)";
     public static final Pattern OPENJDK_SEMVER_REGEX = Pattern.compile(OPENJDK_SEMVER);
 
     @Override
