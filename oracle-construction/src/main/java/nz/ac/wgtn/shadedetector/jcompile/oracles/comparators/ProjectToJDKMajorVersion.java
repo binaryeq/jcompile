@@ -1,6 +1,6 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles.comparators;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,14 +40,11 @@ public class ProjectToJDKMajorVersion implements UnaryOperator<String> {
     }
 
     private static Map<String, String> loadJdkMajorVersionMap() {
-        try {
-            URL url = ProjectToJDKMajorVersion.class.getResource("/ecj-jdk-versions.tsv");
-            if (url == null) {
-                throw new RuntimeException("Could not find ECJ JDK version resource file");
-            }
-
+        try (InputStream is = ProjectToJDKMajorVersion.class.getResourceAsStream("/ecj-jdk-versions.tsv");
+             Reader reader = new InputStreamReader(is);
+             BufferedReader br = new BufferedReader(reader)) {
             Map<String, String> map = new HashMap<>();
-            for (String line : Files.readAllLines(Path.of(url.getFile()))) {
+            for (String line : br.lines().toList()) {
                 if (!line.startsWith("eclipse_release\t")) {              // Skip header line
                     String[] fields = line.trim().split("\t");      // Eclipse release, ECJ Compiler version, Max supported major JDK version
                     map.put(fields[1], fields[2]);
