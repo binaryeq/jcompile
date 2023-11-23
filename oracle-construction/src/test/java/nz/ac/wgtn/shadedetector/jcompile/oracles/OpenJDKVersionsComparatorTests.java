@@ -53,6 +53,11 @@ public class OpenJDKVersionsComparatorTests {
     }
 
     @Test
+    public void testMicro4() {
+        assertTrue(0 > new OpenJDKVersionsComparator().compare("openjdk-1.2.4","openjdk-1.2.23"));
+    }
+
+    @Test
     public void testMinor1() {
         assertTrue(0 > new OpenJDKVersionsComparator().compare("openjdk-1.1.3","openjdk-1.2.3"));
     }
