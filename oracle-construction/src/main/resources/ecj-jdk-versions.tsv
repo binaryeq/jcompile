@@ -34,3 +34,4 @@ eclipse_release	ecj_version	max_supported_jdk
 4.7	3.13.0	8
 4.8	3.14.0	9
 4.9	3.15.0	9
+NONE	3.15.1	9
