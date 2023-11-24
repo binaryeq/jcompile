@@ -1,6 +1,7 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.OpenJDKVersionsComparator;
+import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.CompilerVersionsComparator;
+import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.ProjectToJDKMajorVersion;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.index;
+import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.sorted;
 
 /**
  * Construct a positive oracle for jars, i.e. sets of jars that originate from the same source code,
@@ -22,16 +24,43 @@ public class SameArtifactDifferentCompilerJarOracle implements JarOracle {
 
         Map<String,Set<Path>> jarsByArtifact = Utils.collectJarsByArtifact(jarFolder);
         List<Pair<Path, Path>> oracle = new ArrayList<>();
-        OpenJDKVersionsComparator versionComparator = new OpenJDKVersionsComparator();
+        CompilerVersionsComparator versionComparator = new CompilerVersionsComparator();
+        ProjectToJDKMajorVersion projectToJDKMajorVersion = new ProjectToJDKMajorVersion();
 
-        for (String artifact:jarsByArtifact.keySet()) {
-            List<Path> jarsSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
+        for (String artifact : sorted(jarsByArtifact.keySet())) {
+            Map<String, List<Path>> jarsGroupedByCompilerLineageSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
                 .sorted((f1,f2) -> versionComparator.compare(Utils.COMPILER_USED.apply(f1),Utils.COMPILER_USED.apply(f2)))
-                .collect(Collectors.toList());
+                .collect(Collectors.groupingBy(f1 -> CompilerVersionsComparator.getLineageAndSemVer(Utils.COMPILER_USED.apply(f1))[0]));
 
-            // instead of using all combinations, only use adjacent pairs
-            for (int i=1;i<jarsSortedByCompilerVersion.size();i++) {
-                oracle.add(Pair.of(jarsSortedByCompilerVersion.get(i-1),jarsSortedByCompilerVersion.get(i)));
+            Map<String, List<Path>> jarsByMajorJdkVersion = new HashMap<>();
+
+            for (String lineage : sorted(jarsGroupedByCompilerLineageSortedByCompilerVersion.keySet())) {
+                List<Path> jarsForLineage = jarsGroupedByCompilerLineageSortedByCompilerVersion.get(lineage);
+
+                // instead of using all combinations, only use (1) adjacent pairs from the same compiler lineage and
+                // (2) pairs of compilers of different lineages that have corresponding JDK major versions
+                for (int i = 0; i < jarsForLineage.size(); i++) {
+                    if (i >= 1) {
+                        // Adjacent pair of compiler versions in same lineage
+                        oracle.add(Pair.of(jarsForLineage.get(i - 1), jarsForLineage.get(i)));
+                    }
+
+                    String compilerName = Utils.COMPILER_USED.apply(jarsForLineage.get(i));
+                    String maxSupportedJdkVersion = projectToJDKMajorVersion.apply(compilerName);
+
+                    if (jarsByMajorJdkVersion.containsKey(maxSupportedJdkVersion)) {
+                        for (Path otherJar : jarsByMajorJdkVersion.get(maxSupportedJdkVersion)) {
+                            String otherCompilerName = Utils.COMPILER_USED.apply(otherJar);
+                            if (!CompilerVersionsComparator.getLineageAndSemVer(otherCompilerName)[0].equals(CompilerVersionsComparator.getLineageAndSemVer(compilerName)[0])) {
+                                // Different-lineage compiler supporting the same max JDK major version
+                                oracle.add(Pair.of(otherJar, jarsForLineage.get(i)));
+                            }
+                        }
+                    } else {
+                        jarsByMajorJdkVersion.put(maxSupportedJdkVersion, new ArrayList<>());
+                    }
+                    jarsByMajorJdkVersion.get(maxSupportedJdkVersion).add(jarsForLineage.get(i));
+                }
             }
         }
 

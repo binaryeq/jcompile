@@ -1,13 +1,11 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.OpenJDKVersionsComparator;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.*;
 
