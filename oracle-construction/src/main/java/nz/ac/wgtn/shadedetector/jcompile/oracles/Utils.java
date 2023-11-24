@@ -176,6 +176,15 @@ public class Utils {
      */
     public static Map<String,Set<Path>> collectJarsByComponentAndBuild(Path jarFolder) throws IOException {
         return index(jarFolder, f -> COMPILER_USED.apply(f) + "#" + COMPONENT_NAME.apply(f));
+
+    }
+
+    /**
+     * Convenience method to make a sorted list from any collection by using the default comparator.
+     * Useful for increasing determinism when using {@link HashSet} or {@link HashMap}.
+     */
+    public static <E> List<E> sorted(Collection<E> c) {
+        return c.stream().sorted().toList();
     }
 
 }
