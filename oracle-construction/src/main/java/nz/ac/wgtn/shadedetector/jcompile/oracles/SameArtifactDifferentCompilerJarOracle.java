@@ -50,8 +50,10 @@ public class SameArtifactDifferentCompilerJarOracle implements JarOracle {
 
                     if (jarsByMajorJdkVersion.containsKey(maxSupportedJdkVersion)) {
                         for (Path otherJar : jarsByMajorJdkVersion.get(maxSupportedJdkVersion)) {
-                            // Different-lineage compiler supporting the same max JDK major version
-                            oracle.add(Pair.of(otherJar, jarsForLineage.get(i)));
+                            if (!OpenJDKVersionsComparator.getLineageAndSemVer(Utils.COMPILER_USED.apply(otherJar))[0].equals(OpenJDKVersionsComparator.getLineageAndSemVer(Utils.COMPILER_USED.apply(jarsForLineage.get(i)))[0])) {
+                                // Different-lineage compiler supporting the same max JDK major version
+                                oracle.add(Pair.of(otherJar, jarsForLineage.get(i)));
+                            }
                         }
                     } else {
                         jarsByMajorJdkVersion.put(maxSupportedJdkVersion, new ArrayList<>());
