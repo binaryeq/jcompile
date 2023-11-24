@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.SemVer.compareSemVer;
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.SemVer.parseSemVer;
 
-public class OpenJDKVersionsComparator implements Comparator<String> {
+public class CompilerVersionsComparator implements Comparator<String> {
 
-    public static final String OPENJDK_SEMVER = "^([^\\.]+)-(\\d+\\.\\d+\\.\\d+)";
-    public static final Pattern OPENJDK_SEMVER_REGEX = Pattern.compile(OPENJDK_SEMVER);
+    public static final String LINEAGE_SEMVER = "^([^\\.]+)-(\\d+\\.\\d+\\.\\d+)";
+    public static final Pattern LINEAGE_SEMVER_REGEX = Pattern.compile(LINEAGE_SEMVER);
 
     @Override
     public int compare(String o1, String o2) {
@@ -32,11 +32,11 @@ public class OpenJDKVersionsComparator implements Comparator<String> {
      * @return array containing compiler lineage name as the first element, semver as the second element
      */
     public static String[] getLineageAndSemVer(String compilerName) {
-        Matcher m = OPENJDK_SEMVER_REGEX.matcher(compilerName);
+        Matcher m = LINEAGE_SEMVER_REGEX.matcher(compilerName);
         if (m.find()) {
             return new String[] { m.group(1), m.group(2) };
         } else {
-            throw new IllegalArgumentException("'" + compilerName + "' does not match " + OPENJDK_SEMVER);
+            throw new IllegalArgumentException("'" + compilerName + "' does not match " + LINEAGE_SEMVER);
         }
     }
 

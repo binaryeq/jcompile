@@ -1,6 +1,6 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.OpenJDKVersionsComparator;
+import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.CompilerVersionsComparator;
 import nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.ProjectToJDKMajorVersion;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -24,13 +24,13 @@ public class SameArtifactDifferentCompilerJarOracle implements JarOracle {
 
         Map<String,Set<Path>> jarsByArtifact = Utils.collectJarsByArtifact(jarFolder);
         List<Pair<Path, Path>> oracle = new ArrayList<>();
-        OpenJDKVersionsComparator versionComparator = new OpenJDKVersionsComparator();
+        CompilerVersionsComparator versionComparator = new CompilerVersionsComparator();
         ProjectToJDKMajorVersion projectToJDKMajorVersion = new ProjectToJDKMajorVersion();
 
         for (String artifact : sorted(jarsByArtifact.keySet())) {
             Map<String, List<Path>> jarsGroupedByCompilerLineageSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
                 .sorted((f1,f2) -> versionComparator.compare(Utils.COMPILER_USED.apply(f1),Utils.COMPILER_USED.apply(f2)))
-                .collect(Collectors.groupingBy(f1 -> OpenJDKVersionsComparator.getLineageAndSemVer(Utils.COMPILER_USED.apply(f1))[0]));
+                .collect(Collectors.groupingBy(f1 -> CompilerVersionsComparator.getLineageAndSemVer(Utils.COMPILER_USED.apply(f1))[0]));
 
             Map<String, List<Path>> jarsByMajorJdkVersion = new HashMap<>();
 
@@ -51,7 +51,7 @@ public class SameArtifactDifferentCompilerJarOracle implements JarOracle {
                     if (jarsByMajorJdkVersion.containsKey(maxSupportedJdkVersion)) {
                         for (Path otherJar : jarsByMajorJdkVersion.get(maxSupportedJdkVersion)) {
                             String otherCompilerName = Utils.COMPILER_USED.apply(otherJar);
-                            if (!OpenJDKVersionsComparator.getLineageAndSemVer(otherCompilerName)[0].equals(OpenJDKVersionsComparator.getLineageAndSemVer(compilerName)[0])) {
+                            if (!CompilerVersionsComparator.getLineageAndSemVer(otherCompilerName)[0].equals(CompilerVersionsComparator.getLineageAndSemVer(compilerName)[0])) {
                                 // Different-lineage compiler supporting the same max JDK major version
                                 oracle.add(Pair.of(otherJar, jarsForLineage.get(i)));
                             }
