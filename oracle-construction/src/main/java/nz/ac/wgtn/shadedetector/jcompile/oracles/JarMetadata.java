@@ -1,6 +1,7 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,9 +46,8 @@ public class JarMetadata {
     private static Map<Path, String> loadSourceFileOrigins(Path jarPath) {
         Path generatedSourcesPath = Path.of(jarPath.toString() + ".generated-sources");
         Map<Path, String> map = new HashMap<>();
-        try (Reader reader = new FileReader(generatedSourcesPath.toFile());
-             BufferedReader br = new BufferedReader(reader)) {
-            for (String line : br.lines().toList()) {
+        try {
+            for (String line : Files.readAllLines(generatedSourcesPath)) {
                 Matcher matcher = Pattern.compile("^target/generated-sources/([^/]+)(/.+\\.java)$").matcher(line);  // Include leading slash
                 if (matcher.matches()) {
                     System.err.println("Generated file: " + matcher.group(1) + " generated " + matcher.group(2));       //DEBUG
