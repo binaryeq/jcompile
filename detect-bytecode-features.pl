@@ -17,7 +17,10 @@ open JAVAP, "-|", "javap", "-c", "-v", @ARGV or die;		# Open a pipe from javap, 
 while (<JAVAP>) {
 	if (/^Classfile (.*)/) {
 		outputClass() if defined $currentClass;
-		$currentClass = $1;
+		if (@ARGV && $1 =~ /\Q$ARGV[0]\E$/) {
+			$currentClass = shift;
+			print STDERR "New current class: $currentClass\n";		#DEBUG
+		}
 		%has = ();
 		$inFunction = 0;
 		#TODO: Trim off start of path
