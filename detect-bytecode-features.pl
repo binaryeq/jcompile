@@ -19,20 +19,16 @@ while (<JAVAP>) {
 		outputClass() if defined $currentClass;
 		if (@ARGV && $1 =~ /\Q$ARGV[0]\E$/) {
 			$currentClass = shift;
-			print STDERR "New current class: $currentClass\n";		#DEBUG
 		}
 		%has = ();
 		$inFunction = 0;
-		#TODO: Trim off start of path
 	} else {
 		if ($feature eq 'JEP181') {
 			# JDK >= 11 uses "nests" to allow inner classes to access private members of outer classes directly, instead of creating synthetic methods in the outer class: https://openjdk.org/jeps/181
 			# A positive detection (exit code 0) means the *old* (JDK < 11) behaviour, since this is easier to test for.
 			if (/^  ([^ ].*);$/ && $1 =~ /static .* access\$[0-9]+\(/) {
-				print STDERR "Starting function $1\n";		#DEBUG
 				$inFunction = 1;
 			} elsif (/^}?\s*$/) {
-				print STDERR "Ending function\n";		#DEBUG
 				$inFunction = 0;
 			}
 
