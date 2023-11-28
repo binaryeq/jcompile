@@ -68,7 +68,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
             JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
             for (Path commonClass : sorted(commonClasses)) {
                 ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass), jarMetadata1.getBytecodeFeatures(commonClass));
-                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass), jarMetadata1.getBytecodeFeatures(commonClass));
+                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass), jarMetadata2.getBytecodeFeatures(commonClass));
                 if (includeClassPair(zpath1, zpath2)) {
                     classOracle.add(Pair.of(zpath1, zpath2));
                 }

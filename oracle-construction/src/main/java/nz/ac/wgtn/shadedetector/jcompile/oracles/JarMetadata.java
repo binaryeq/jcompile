@@ -17,6 +17,7 @@ public class JarMetadata {
 
     private final Path jar;
     private Map<Path, String> sourceFileOrigins;    // Maps path below target/generated-sources/<tool> to <tool>
+    private Map<Path, Set<String>> bytecodeFeatures;
 
     public JarMetadata(Path jar) {
         this.jar = jar;
@@ -43,7 +44,6 @@ public class JarMetadata {
         return sourceFileOrigins;
     }
 
-    private Map<Path, Set<String>> bytecodeFeatures;
     private synchronized Map<Path, Set<String>> getBytecodeFeatures() {
         if (bytecodeFeatures == null) {
             bytecodeFeatures = loadBytecodeFeatures(jar);
@@ -84,6 +84,7 @@ public class JarMetadata {
                 if (matcher.matches()) {
                     List<String> rest = new ArrayList<>(Arrays.asList(fields));
                     rest.remove(0);
+                    System.err.println("Bytecode features for " + matcher.group(1) + ": " + rest); //DEBUG
                     map.put(Path.of(matcher.group(1)), new HashSet<>(rest));
                 }
             }
