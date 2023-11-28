@@ -1,12 +1,17 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.isAnonymousInnerClass;
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.isPackageInfo;
+
+import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.*;
 
 /**
  * Abstract super class.
@@ -34,7 +39,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
         return includeAnonymousInnerClasses;
     }
 
-    protected boolean include(Path p) {
+    protected boolean includeClass(Path p) {
         if (!includePackageInfo && isPackageInfo(p)) {
             return false;
         }
@@ -47,8 +52,38 @@ public abstract class AbstractClassOracle implements ClassOracle {
     protected Set<Path> getClasses(Path p) throws IOException, URISyntaxException {
         Set<Path> classes = Utils.collectClasses(p);
         return classes.stream()
-            .filter(f -> include(f))
+            .filter(f -> includeClass(f))
             .collect(Collectors.toSet());
+    }
+
+    protected List<Pair<ZipPath, ZipPath>> buildFromJarPairs(List<Pair<Path, Path>> jarOracle) throws IOException, URISyntaxException {
+        List<Pair<ZipPath, ZipPath>> classOracle = new ArrayList<>();
+
+        for (Pair<Path,Path> jars: jarOracle) {
+            System.err.println("analysing: " + jars.getLeft().toString() + " vs " + jars.getRight().toString());
+            Set<Path> classes1 = getClasses(jars.getLeft());
+            Set<Path> classes2 = getClasses(jars.getRight());
+            Set<Path> commonClasses = findCommonPaths(classes1,classes2);
+            JarMetadata jarMetadata1 = new JarMetadata(jars.getLeft());
+            JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
+            for (Path commonClass : sorted(commonClasses)) {
+                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass));
+                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass));
+                if (includeClassPair(zpath1, zpath2)) {
+                    classOracle.add(Pair.of(zpath1, zpath2));
+                }
+            }
+        }
+
+        return classOracle;
+    }
+
+    // whether to include this class reference in the oracle
+    private boolean includeClassPair(ZipPath zpath1, ZipPath zpath2) throws IOException, URISyntaxException {
+        assert ! zpath1.outerPath().toString().equals(zpath2.outerPath().toString()) ;
+        byte[] content1 = read(zpath1);
+        byte[] content2 = read(zpath2);
+        return !Arrays.equals(content1,content2);
     }
 
 }
