@@ -116,7 +116,7 @@ echo "building project"
 # "docker exec -it" fails if stdin is not a terminal, e.g., when running in the background
 # "umask 0" to make downloaded artifacts, which will be saved in the shared cache as root, can be modified/deleted from the host. "exec" to keep mvn as pid 1, important for docker signal handling.
 [ "$STOP_BEFORE" = "mvn" ] && exit
-docker exec -t $DOCKER_CONTAINER sh -c "umask 0; exec ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -Dmaven.test.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
+docker exec -t $DOCKER_CONTAINER sh -c "umask 0; exec ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -DskipTests -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true clean package" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
 # Some projects make files with restricted perms even if umask 0 is in force, and if --userns-remap is in force we otherwise wouldn't be able to delete them on the host afterwards.
 # Ignore "permission denied" on the top-level dir as it's owned by the host uid -- easier than trying to use wildcards to correctly get dotfiles and dotdirs.
 [ "$STOP_BEFORE" = "chmod" ] && exit
@@ -127,6 +127,15 @@ echo ""
 if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
 	cp ${WORKTREE_HOST}/target/${JAR_NAME} ${RESULT_FOLDER}
+
+	# At least some projects also create a jar containing compiled tests -- get that too.
+	TEST_JAR_PATH="${WORKTREE_HOST}/target/${JAR_NAME%%.jar}-tests.jar"
+	if test -f $TEST_JAR_PATH; then
+		echo "Found tests jar $TEST_JAR_PATH, copying that also."
+		cp "$TEST_JAR_PATH" "$RESULT_FOLDER"
+	fi
+
+	# Gather some additional metadata
 	( cd "${WORKTREE_HOST}" && find target/generated-sources | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.generated-sources"	# Failure here creates a 0-length file, which is fine
 	( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' | xargs "$DETECT_BYTECODE_FEATURES" | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.bytecode-features"
 else 
