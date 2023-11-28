@@ -50,7 +50,6 @@ public class JarMetadata {
             for (String line : Files.readAllLines(generatedSourcesPath)) {
                 Matcher matcher = Pattern.compile("^target/generated-sources/([^/]+)(/.+\\.java)$").matcher(line);  // Include leading slash
                 if (matcher.matches()) {
-                    System.err.println("Generated file: " + matcher.group(1) + " generated " + matcher.group(2));       //DEBUG
                     map.put(Path.of(matcher.group(2)), matcher.group(1));
                 }
             }
