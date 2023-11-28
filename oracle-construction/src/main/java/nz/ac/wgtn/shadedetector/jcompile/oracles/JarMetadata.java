@@ -1,10 +1,11 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
+import com.google.common.collect.Sets;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,12 +31,25 @@ public class JarMetadata {
         return getSourceFileOrigins().getOrDefault(Utils.getSourceFileNameForClass(innerPath), "-");
     }
 
+    public Set<String> getBytecodeFeatures(Path innerPath) {
+        return getBytecodeFeatures().getOrDefault(innerPath, Sets.newHashSet("MISSING"));
+    }
+
     private synchronized Map<Path, String> getSourceFileOrigins() {
         if (sourceFileOrigins == null) {
             sourceFileOrigins = loadSourceFileOrigins(jar);
         }
 
         return sourceFileOrigins;
+    }
+
+    private Map<Path, Set<String>> bytecodeFeatures;
+    private synchronized Map<Path, Set<String>> getBytecodeFeatures() {
+        if (bytecodeFeatures == null) {
+            bytecodeFeatures = loadBytecodeFeatures(jar);
+        }
+
+        return bytecodeFeatures;
     }
 
     /**
@@ -56,7 +70,27 @@ public class JarMetadata {
 
             return map;
         } catch (IOException e) {
-            throw new RuntimeException("IO failure opening or reading from ECJ JDK version resource file", e);
+            throw new RuntimeException("IO failure opening or reading from " + jarPath + ".generated-sources file", e);
+        }
+    }
+
+    private static Map<Path, Set<String>> loadBytecodeFeatures(Path jarPath) {
+        Path generatedSourcesPath = Path.of(jarPath.toString() + ".bytecode-features");
+        Map<Path, Set<String>> map = new HashMap<>();
+        try {
+            for (String line : Files.readAllLines(generatedSourcesPath)) {
+                String[] fields = line.split("\t");
+                Matcher matcher = Pattern.compile("^target/[^/\t]*classes(/.+\\.class)$").matcher(fields[0]);  // Include leading slash
+                if (matcher.matches()) {
+                    List<String> rest = new ArrayList<>(Arrays.asList(fields));
+                    rest.remove(0);
+                    map.put(Path.of(matcher.group(1)), new HashSet<>(rest));
+                }
+            }
+
+            return map;
+        } catch (IOException e) {
+            throw new RuntimeException("IO failure opening or reading from " + jarPath + ".bytecode-features file", e);
         }
     }
 }
