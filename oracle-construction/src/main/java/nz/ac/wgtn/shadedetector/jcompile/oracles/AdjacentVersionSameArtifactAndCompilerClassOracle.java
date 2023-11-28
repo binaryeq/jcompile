@@ -39,9 +39,11 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
             Set<Path> classes2 = getClasses(jars.getRight());
 
             Set<Path> commonClasses = findCommonPaths(classes1,classes2);
+            JarMetadata jarMetadata1 = new JarMetadata(jars.getLeft());
+            JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
             for (Path commonClass:commonClasses) {
-                ZipPath zpath1 = new ZipPath(jars.getLeft(),commonClass);
-                ZipPath zpath2 = new ZipPath(jars.getRight(),commonClass);
+                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass));
+                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass));
                 if (include(zpath1,zpath2)) {
                     classOracle.add(Pair.of(zpath1, zpath2));
                 }
