@@ -8,7 +8,6 @@ my $feature = shift;
 my $currentClass;
 my %has;
 my $inFunction = 0;
-my $jep181State = 0;
 
 sub outputClass() {
 	print join("\t", $currentClass, sort grep { $has{$_} } keys %has), "\n";
@@ -19,28 +18,22 @@ while (<JAVAP>) {
 	if (/^Classfile (.*)/) {
 		outputClass() if defined $currentClass;
 		$currentClass = $1;
-		$jep181State = 0;
 		%has = ();
+		$inFunction = 0;
 		#TODO: Trim off start of path
 	} else {
 		if ($feature eq 'JEP181') {
 			# JDK >= 11 uses "nests" to allow inner classes to access private members of outer classes directly, instead of creating synthetic methods in the outer class: https://openjdk.org/jeps/181
 			# A positive detection (exit code 0) means the *old* (JDK < 11) behaviour, since this is easier to test for.
-			if (/^  ([^ ].*);$/) {
+			if (/^  ([^ ].*);$/ && $1 =~ /static .* access\$[0-9]+\(/) {
 				print STDERR "Starting function $1\n";		#DEBUG
 				$inFunction = 1;
-				$jep181State = 0;
 			} elsif (/^}?\s*$/) {
 				print STDERR "Ending function\n";		#DEBUG
 				$inFunction = 0;
 			}
 
-			if ($inFunction) {
-				++$jep181State if /static .* access\$[0-9]+\(/;
-				$jep181State += 10 if /ACC_SYNTHETIC|Synthetic: true/;
-				print STDERR "jep181State=$jep181State\n";		#DEBUG
-				$has{JEP181} = 1 if $jep181State == 11;
-			}
+			$has{JEP181} = 1 if $inFunction && /ACC_SYNTHETIC|Synthetic: true/;
 		} elsif ($feature eq 'JEP280') {
 			# JDK >= 9 uses special invokedynamic calls to concatenate string literals instead of StringBuilder: https://openjdk.org/jeps/280, https://docs.oracle.com/javase/9/docs/api/java/lang/invoke/StringConcatFactory.html
 			# A positive detection (exit code 0) means the *new* (JDK >= 9) behaviour, since this is easier to test for.
