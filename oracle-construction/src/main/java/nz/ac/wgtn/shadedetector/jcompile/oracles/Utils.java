@@ -62,11 +62,8 @@ public class Utils {
     }
 
     public static Set<Path> collectClasses(Path jar) throws IOException, URISyntaxException {
-        URI uri = jar.toUri();
-        uri = new URI("jar:"+uri);
-        Map<String, String> env = new HashMap<>();
         Set<Path> classFiles = new HashSet<>();
-        try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+        try (FileSystem zipfs = getJarFileSystem(jar)) {
             for (Path root:zipfs.getRootDirectories()) {
                 Files.walk(root)
                     .filter(Files::exists)
@@ -81,10 +78,7 @@ public class Utils {
     }
 
     public static byte[] read(ZipPath zipPath) throws IOException, URISyntaxException {
-        URI uri = zipPath.outerPath().toUri();
-        uri = new URI("jar:"+uri);
-        Map<String, String> env = new HashMap<>();
-        try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+        try (FileSystem zipfs = getJarFileSystem(zipPath.outerPath())) {
             Path entry = zipfs.getPath(zipPath.innerPath().toString());
             return Files.readAllBytes(entry);
         }
@@ -203,6 +197,10 @@ public class Utils {
      */
     public static <E> List<E> sorted(Collection<E> c) {
         return c.stream().sorted().toList();
+    }
+
+    public static FileSystem getJarFileSystem(Path jarPath) throws IOException, URISyntaxException {
+        return FileSystems.newFileSystem(new URI("jar:" + jarPath.toUri()), new HashMap<>());
     }
 
 }
