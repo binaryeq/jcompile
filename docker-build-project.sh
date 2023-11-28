@@ -127,6 +127,15 @@ echo ""
 if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
 	cp ${WORKTREE_HOST}/target/${JAR_NAME} ${RESULT_FOLDER}
+
+	# At least some projects also create a jar containing compiled tests -- get that too.
+	TEST_JAR_PATH="${WORKTREE_HOST}/target/${JAR_NAME%%.jar}-tests.jar"
+	if test -f $TEST_JAR_PATH; then
+		echo "Found tests jar $TEST_JAR_PATH, copying that also."
+		cp "$TEST_JAR_PATH" "$RESULT_FOLDER"
+	fi
+
+	# Gather some additional metadata
 	( cd "${WORKTREE_HOST}" && find target/generated-sources | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.generated-sources"	# Failure here creates a 0-length file, which is fine
 	( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' | xargs "$DETECT_BYTECODE_FEATURES" | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.bytecode-features"
 else 
