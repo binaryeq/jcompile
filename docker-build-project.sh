@@ -62,7 +62,7 @@ if test -f "${RESULT_ERROR_LOG}"; then
 fi
 
 
-DETECT_BYTECODE_FEATURES="$(pwd)/detect-bytecode-features.sh"
+DETECT_BYTECODE_FEATURES="$(pwd)/detect-bytecode-features.pl"
 if test '!' -x "$DETECT_BYTECODE_FEATURES"; then
 	echo "Cannot run $DETECT_BYTECODE_FEATURES, please ensure it is in the current directory."
 	exit 1
@@ -128,11 +128,7 @@ if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
 	cp ${WORKTREE_HOST}/target/${JAR_NAME} ${RESULT_FOLDER}
 	( cd "${WORKTREE_HOST}" && find target/generated-sources | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.generated-sources"	# Failure here creates a 0-length file, which is fine
-	for FEATURE in JEP181 JEP280
-	do
-		# For simplicity, each feature gets its own text file, which consists of a list of all .class files that have that feature
-		( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' -exec "$DETECT_BYTECODE_FEATURES" "$FEATURE" '{}' ';' | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.has-feature.$FEATURE"
-	done
+	( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' | xargs "$DETECT_BYTECODE_FEATURES" | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.bytecode-features"
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
