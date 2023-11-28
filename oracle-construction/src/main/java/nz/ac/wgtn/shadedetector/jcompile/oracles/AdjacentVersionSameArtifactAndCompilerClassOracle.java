@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.findCommonPaths;
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.read;
+
+import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.*;
 
 /**
  * Construct a negative oracle for classes, i.e. sets of classes that originate from different but similar source code (adjacent versions),
@@ -34,14 +34,16 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
 
         for (Pair<Path,Path> jars:jarOracle) {
 
-            System.out.println("analysing: " + jars.getLeft().toString());
+            System.out.println("analysing: " + jars.getLeft().toString() + " vs " + jars.getRight().toString());
             Set<Path> classes1 = getClasses(jars.getLeft());
             Set<Path> classes2 = getClasses(jars.getRight());
 
             Set<Path> commonClasses = findCommonPaths(classes1,classes2);
-            for (Path commonClass:commonClasses) {
-                ZipPath zpath1 = new ZipPath(jars.getLeft(),commonClass);
-                ZipPath zpath2 = new ZipPath(jars.getRight(),commonClass);
+            JarMetadata jarMetadata1 = new JarMetadata(jars.getLeft());
+            JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
+            for (Path commonClass : sorted(commonClasses)) {
+                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass));
+                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass));
                 if (include(zpath1,zpath2)) {
                     classOracle.add(Pair.of(zpath1, zpath2));
                 }

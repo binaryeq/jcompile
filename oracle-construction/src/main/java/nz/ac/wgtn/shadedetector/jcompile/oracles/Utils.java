@@ -36,6 +36,24 @@ public class Utils {
         return p.getFileName().toString().equals("package-info.class");
     }
 
+    /**
+     * Strips any inner class part (anonymous or not) from a {@code .class} or {@code .java} filename.
+     */
+    public static Path getTopLevelClass(Path p) {
+        return p.getParent().resolve(p.getFileName().toString().replaceFirst("\\$[^.]*", ""));
+    }
+
+    /**
+     * Converts a {@code .class} filename to its corresponding {@code .java} source filename.
+     * Strips any inner class part (anonymous or not).
+     * @param p the path to a {@code .class} file
+     * @return the path to the corresponding {@code .java} file
+     */
+    public static Path getSourceFileNameForClass(Path p) {
+        assert p.toString().endsWith(".class");
+        return Path.of(getTopLevelClass(p).toString().replaceFirst("\\.class$", ".java"));
+    }
+
     public static Set<Path> collectJars(Path jarFolder) throws IOException {
         return Files.walk(jarFolder)
             .filter(Files::exists)
@@ -54,7 +72,7 @@ public class Utils {
                     .filter(Files::exists)
                     .filter(f -> !Files.isDirectory(f))
                     .filter(f -> f.getFileName()!=null)
-                    .filter(f -> f.getFileName().toString().endsWith(".class"))  // this excludes .jar.error !
+                    .filter(f -> f.getFileName().toString().endsWith(".class"))
                     //.map(f -> jar.resolve(f))
                     .forEach(f -> classFiles.add(f));
             }

@@ -122,6 +122,7 @@ echo ""
 if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	echo "SUCCESS! - copying /target/${JAR_NAME}  into ${RESULT_FOLDER}"
 	cp ${WORKTREE_HOST}/target/${JAR_NAME} ${RESULT_FOLDER}
+	( cd "${WORKTREE_HOST}" && find target/generated-sources | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.generated-sources"	# Failure here creates a 0-length file, which is fine
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}

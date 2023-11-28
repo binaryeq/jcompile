@@ -32,13 +32,15 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
         List<Pair<ZipPath, ZipPath>> classOracle = new ArrayList<>();
 
         for (Pair<Path,Path> jars:jarOracle) {
-            System.err.println("analysing: " + jars.getLeft().toString());
+            System.err.println("analysing: " + jars.getLeft().toString() + " vs " + jars.getRight().toString());
             Set<Path> classes1 = getClasses(jars.getLeft());
             Set<Path> classes2 = getClasses(jars.getRight());
             Set<Path> commonClasses = findCommonPaths(classes1,classes2);
-            for (Path commonClass:commonClasses) {
-                ZipPath zpath1 = new ZipPath(jars.getLeft(),commonClass);
-                ZipPath zpath2 = new ZipPath(jars.getRight(),commonClass);
+            JarMetadata jarMetadata1 = new JarMetadata(jars.getLeft());
+            JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
+            for (Path commonClass : sorted(commonClasses)) {
+                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass));
+                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass));
                 if (include(zpath1, zpath2)) {
                     classOracle.add(Pair.of(zpath1, zpath2));
                 }
@@ -59,9 +61,9 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
         List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
-        System.out.println("container1\tcontainer2\tclass1\tclass2");
+        System.out.println("container1\tcontainer2\tclass1\tclass2\tgenerated_by_1\tgenerated_by_2");
         for (Pair<ZipPath, ZipPath> paths : oracle) {
-            System.out.println(paths.getLeft().outerPath() + "\t" + paths.getRight().outerPath() + "\t" + paths.getLeft().innerPath() + "\t" + paths.getRight().innerPath());
+            System.out.println(paths.getLeft().outerPath() + "\t" + paths.getRight().outerPath() + "\t" + paths.getLeft().innerPath() + "\t" + paths.getRight().innerPath() + "\t" + paths.getLeft().generatedBy() + "\t" + paths.getRight().generatedBy());
         }
     }
 

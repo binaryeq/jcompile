@@ -5,4 +5,4 @@ import java.nio.file.Path;
 /**
  * A zip path consists of a path
  */
-public record ZipPath (Path outerPath, Path innerPath) {}
+public record ZipPath (Path outerPath, Path innerPath, String generatedBy) {}
