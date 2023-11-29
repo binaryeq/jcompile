@@ -67,7 +67,7 @@ public class JarMetadata {
         Map<String, String> map = new HashMap<>();
         try {
             for (String line : Files.readAllLines(generatedSourcesPath)) {
-                Matcher matcher = Pattern.compile("^target/generated-sources/([^/]+)(/.+\\.java)$").matcher(line);  // Include leading slash
+                Matcher matcher = Pattern.compile("^target/generated(?:-test)?-sources/([^/]+)(/.+\\.java)$").matcher(line);  // Include leading slash
                 if (matcher.matches()) {
                     map.put(matcher.group(2), matcher.group(1));
                 }

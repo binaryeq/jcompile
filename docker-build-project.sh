@@ -136,7 +136,7 @@ if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	fi
 
 	# Gather some additional metadata
-	( cd "${WORKTREE_HOST}" && find target/generated-sources | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.generated-sources"	# Failure here creates a 0-length file, which is fine
+	( cd "${WORKTREE_HOST}" && find target/generated-{,test-}sources -type f -name '*.java' | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.generated-sources"	# Failure here creates a 0-length file, which is fine
 	( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' | xargs "$DETECT_BYTECODE_FEATURES" | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.bytecode-features"
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
