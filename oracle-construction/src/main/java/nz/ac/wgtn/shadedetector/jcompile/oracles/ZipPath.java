@@ -6,4 +6,4 @@ import java.util.Set;
 /**
  * A zip path consists of a path
  */
-public record ZipPath (Path outerPath, Path innerPath, String generatedBy, Set<String> bytecodeFeatures) {}
+public record ZipPath (Path outerPath, Path innerPath, String generatedBy, Set<String> bytecodeFeatures, String scope) {}

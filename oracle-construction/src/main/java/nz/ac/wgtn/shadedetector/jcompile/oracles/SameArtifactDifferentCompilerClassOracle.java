@@ -34,7 +34,7 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
         List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
-        System.out.println("container1\tcontainer2\tclass1\tclass2\tgenerated_by_1\tgenerated_by_2\tbytecode_jep181_1\tbytecode_jep181_2\tbytecode_jep280_1\tbytecode_jep280_2");
+        System.out.println("container1\tcontainer2\tclass1\tclass2\tgenerated_by_1\tgenerated_by_2\tbytecode_jep181_1\tbytecode_jep181_2\tbytecode_jep280_1\tbytecode_jep280_2\tscope_1\tscope_2");
         for (Pair<ZipPath, ZipPath> paths : oracle) {
             System.out.println(paths.getLeft().outerPath() +
                     "\t" + paths.getRight().outerPath() +
@@ -45,7 +45,9 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                     "\t" + paths.getLeft().bytecodeFeatures().contains("JEP181") +
                     "\t" + paths.getRight().bytecodeFeatures().contains("JEP181") +
                     "\t" + paths.getLeft().bytecodeFeatures().contains("JEP280") +
-                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP280"));
+                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP280") +
+                    "\t" + paths.getLeft().scope() +
+                    "\t" + paths.getRight().scope());
         }
     }
 
