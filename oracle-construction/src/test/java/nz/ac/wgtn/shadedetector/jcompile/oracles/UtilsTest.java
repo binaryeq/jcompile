@@ -71,6 +71,49 @@ public class UtilsTest {
             Path defaultFileSystemPath = Path.of("/abc/SomeClass.class");
             Path result = Utils.getTopLevelClass(p);
             assertEquals(result.getFileSystem(), p.getFileSystem());
+            assertEquals(result, p.getParent().resolve("SomeClass.class"));
+            assertNotEquals(result, defaultFileSystemPath);
+        }
+    }
+
+    @Test
+    public void testGetSourceFileNameForClass_alreadyTopLevel() {
+        Path p = Path.of("/abc/SomeClass.class");
+        assertEquals(Path.of("/abc/SomeClass.java"), Utils.getSourceFileNameForClass(p));
+    }
+
+    @Test
+    public void testGetSourceFileNameForClass_innerClass() {
+        Path p = Path.of("/abc/SomeClass$InnerClass.class");
+        assertEquals(Path.of("/abc/SomeClass.java"), Utils.getSourceFileNameForClass(p));
+    }
+
+    @Test
+    public void testGetSourceFileNameForClass_anonymousInnerClass() {
+        Path p = Path.of("/abc/SomeClass$123.class");
+        assertEquals(Path.of("/abc/SomeClass.java"), Utils.getSourceFileNameForClass(p));
+    }
+
+    @Test
+    public void testGetSourceFileNameForClass_multiLevelInnerClass() {
+        Path p = Path.of("/abc/SomeClass$TopInnerClass$42$LowestInner.class");
+        assertEquals(Path.of("/abc/SomeClass.java"), Utils.getSourceFileNameForClass(p));
+    }
+
+    @Test
+    public void testGetSourceFileNameForClass_javaInFilenameTwice() {
+        Path p = Path.of("/abc/dir.java/subdir.java_again/SomeClass.class");
+        assertEquals(Path.of("/abc/dir.java/subdir.java_again/SomeClass.java"), Utils.getSourceFileNameForClass(p));
+    }
+
+    @Test
+    public void testGetSourceFileNameForClass_preservesFileSystem() throws URISyntaxException, IOException {
+        try (FileSystem zipfs = Utils.getJarFileSystem(JARS.resolve("openjdk-9.0.1").resolve("commons-codec-1.11.jar"))) {
+            Path p = zipfs.getPath("/abc/SomeClass.class");
+            Path defaultFileSystemPath = Path.of("/abc/SomeClass.java");
+            Path result = Utils.getSourceFileNameForClass(p);
+            assertEquals(result.getFileSystem(), p.getFileSystem());
+            assertEquals(result, p.getParent().resolve("SomeClass.java"));
             assertNotEquals(result, defaultFileSystemPath);
         }
     }
