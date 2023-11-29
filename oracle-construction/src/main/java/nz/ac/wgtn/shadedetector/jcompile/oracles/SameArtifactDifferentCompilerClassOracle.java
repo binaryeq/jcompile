@@ -45,7 +45,7 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                     "\t" + paths.getLeft().bytecodeFeatures().contains("JEP181") +
                     "\t" + paths.getRight().bytecodeFeatures().contains("JEP181") +
                     "\t" + paths.getLeft().bytecodeFeatures().contains("JEP280") +
-                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP280") /*DEBUG*/ + "\t" + paths.getLeft().bytecodeFeatures() );
+                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP280"));
         }
     }
 

@@ -87,7 +87,6 @@ public class JarMetadata {
                 if (matcher.matches()) {
                     List<String> rest = new ArrayList<>(Arrays.asList(fields));
                     rest.remove(0);
-                    System.err.println("Bytecode features for " + matcher.group(1) + ": " + rest); //DEBUG
                     map.put(matcher.group(1), new HashSet<>(rest));
                 }
             }
