@@ -20,7 +20,7 @@ public class JarMetadata {
     // Why use Strings as keys instead of Paths? Because Paths can contain "hidden" FileSystems that don't appear when
     // .toString() is called but break .equals() and .hashCode(). Strings are WYSIWYG.
     private Map<String, String> sourceFileOrigins;    // Maps path below target/generated-sources/<tool> to <tool>
-    private Map<Path, Set<String>> bytecodeFeatures;
+    private Map<String, Set<String>> bytecodeFeatures;
 
     public JarMetadata(Path jar) {
         this.jar = jar;
@@ -36,7 +36,7 @@ public class JarMetadata {
     }
 
     public Set<String> getBytecodeFeatures(Path innerPath) {
-        return getBytecodeFeatures().getOrDefault(innerPath, Sets.newHashSet("MISSING"));
+        return getBytecodeFeatures().getOrDefault(innerPath.toString(), Sets.newHashSet("MISSING"));
     }
 
     private synchronized Map<String, String> getSourceFileOrigins() {
@@ -47,7 +47,7 @@ public class JarMetadata {
         return sourceFileOrigins;
     }
 
-    private synchronized Map<Path, Set<String>> getBytecodeFeatures() {
+    private synchronized Map<String, Set<String>> getBytecodeFeatures() {
         if (bytecodeFeatures == null) {
             bytecodeFeatures = loadBytecodeFeatures(jar);
         }
@@ -77,9 +77,9 @@ public class JarMetadata {
         }
     }
 
-    private static Map<Path, Set<String>> loadBytecodeFeatures(Path jarPath) {
+    private static Map<String, Set<String>> loadBytecodeFeatures(Path jarPath) {
         Path generatedSourcesPath = Path.of(jarPath.toString() + ".bytecode-features");
-        Map<Path, Set<String>> map = new HashMap<>();
+        Map<String, Set<String>> map = new HashMap<>();
         try {
             for (String line : Files.readAllLines(generatedSourcesPath)) {
                 String[] fields = line.split("\t");
@@ -88,7 +88,7 @@ public class JarMetadata {
                     List<String> rest = new ArrayList<>(Arrays.asList(fields));
                     rest.remove(0);
                     System.err.println("Bytecode features for " + matcher.group(1) + ": " + rest); //DEBUG
-                    map.put(Path.of(matcher.group(1)), new HashSet<>(rest));
+                    map.put(matcher.group(1), new HashSet<>(rest));
                 }
             }
 
