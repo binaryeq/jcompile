@@ -51,7 +51,8 @@ public class Utils {
      */
     public static Path getSourceFileNameForClass(Path p) {
         assert p.toString().endsWith(".class");
-        return Path.of(getTopLevelClass(p).toString().replaceFirst("\\.class$", ".java"));
+        Path topLevelClass = getTopLevelClass(p);
+        return topLevelClass.getParent().resolve(topLevelClass.getFileName().toString().replaceFirst("\\.class$", ".java"));    // Preserves the FileSystem
     }
 
     public static Set<Path> collectJars(Path jarFolder) throws IOException {
