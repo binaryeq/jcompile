@@ -55,6 +55,17 @@ public class Utils {
         return topLevelClass.getParent().resolve(topLevelClass.getFileName().toString().replaceFirst("\\.class$", ".java"));    // Preserves the FileSystem
     }
 
+    /**
+     * Safe to pass a regular (non-test) jar, in which case the return value will be the same as the input.
+     */
+    public static Path getBaseJarForTestJar(Path jarPath) {
+        return jarPath.getParent().resolve(jarPath.getFileName().toString().replaceFirst("-test.jar$", ".jar"));    // Preserves the FileSystem
+    }
+
+    public static boolean isTestJar(Path jarPath) {
+        return !jarPath.equals(getBaseJarForTestJar(jarPath));
+    }
+
     public static Set<Path> collectJars(Path jarFolder) throws IOException {
         return Files.walk(jarFolder)
             .filter(Files::exists)

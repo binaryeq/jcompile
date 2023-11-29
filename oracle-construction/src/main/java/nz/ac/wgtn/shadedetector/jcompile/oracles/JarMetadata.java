@@ -9,13 +9,15 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.getBaseJarForTestJar;
+
 /**
  * Instances of this class provide additional metadata about the contents of a binary jar, such as which tool (if any)
  * was used to generate the source for a given contained class.
  */
 public class JarMetadata {
 
-    private final Path jar;
+    private final Path jar;                         // The "base" jar ("-test" is stripped from test jars)
 
     // Why use Strings as keys instead of Paths? Because Paths can contain "hidden" FileSystems that don't appear when
     // .toString() is called but break .equals() and .hashCode(). Strings are WYSIWYG.
@@ -23,7 +25,7 @@ public class JarMetadata {
     private Map<String, Set<String>> bytecodeFeatures;
 
     public JarMetadata(Path jar) {
-        this.jar = jar;
+        this.jar = getBaseJarForTestJar(jar);       // Test jar metadata lives in files with names based on the base jar
     }
 
     /**
