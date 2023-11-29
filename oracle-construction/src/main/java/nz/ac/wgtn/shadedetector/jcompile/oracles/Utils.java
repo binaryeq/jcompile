@@ -59,7 +59,7 @@ public class Utils {
      * Safe to pass a regular (non-test) jar, in which case the return value will be the same as the input.
      */
     public static Path getBaseJarForTestJar(Path jarPath) {
-        return jarPath.getParent().resolve(jarPath.getFileName().toString().replaceFirst("-test.jar$", ".jar"));    // Preserves the FileSystem
+        return jarPath.getParent().resolve(jarPath.getFileName().toString().replaceFirst("-tests.jar$", ".jar"));    // Preserves the FileSystem
     }
 
     public static boolean isTestJar(Path jarPath) {
