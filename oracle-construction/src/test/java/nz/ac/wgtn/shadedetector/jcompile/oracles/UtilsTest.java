@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.Set;
 
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.JARS;
 import static org.junit.jupiter.api.Assertions.*;
@@ -116,5 +118,19 @@ public class UtilsTest {
             assertEquals(result, p.getParent().resolve("SomeClass.java"));
             assertNotEquals(result, defaultFileSystemPath);
         }
+    }
+
+    @Test
+    public void testIndex_keysInLexOrderByDefault() throws IOException {
+        Map<String, Set<Path>> map = Utils.index(JARS, p -> p.getFileName().toString());
+        String[] keys = map.keySet().toArray(new String[0]);
+        assertEquals("bcel-6.4.0.jar", keys[0]);
+    }
+
+    @Test
+    public void testIndex_keysInSpecifiedOrder() throws IOException {
+        Map<String, Set<Path>> map = Utils.index(JARS, p -> p.getFileName().toString(), (a, b) -> -a.compareTo(b));     // Reverse lex order
+        String[] keys = map.keySet().toArray(new String[0]);
+        assertEquals("commons-codec-1.12.jar", keys[0]);
     }
 }

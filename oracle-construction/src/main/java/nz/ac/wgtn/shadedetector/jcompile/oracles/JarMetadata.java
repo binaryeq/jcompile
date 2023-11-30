@@ -69,6 +69,10 @@ public class JarMetadata {
             for (String line : Files.readAllLines(generatedSourcesPath)) {
                 Matcher matcher = Pattern.compile("^target/generated(?:-test)?-sources/([^/]+)(/.+\\.java)$").matcher(line);  // Include leading slash
                 if (matcher.matches()) {
+                    // Original and generated tests could map to the same path after removing the top-level dir
+                    if (map.containsKey(matcher.group(2))) {
+                        throw new RuntimeException("Multiple source paths exist for class " + matcher.group(2) + "! Second is " + line);
+                    }
                     map.put(matcher.group(2), matcher.group(1));
                 }
             }
@@ -87,6 +91,11 @@ public class JarMetadata {
                 String[] fields = line.split("\t");
                 Matcher matcher = Pattern.compile("^target/[^/\t]*classes(/.+\\.class)$").matcher(fields[0]);  // Include leading slash
                 if (matcher.matches()) {
+                    // Original and generated tests could map to the same path after removing the top-level dir
+                    if (map.containsKey(matcher.group(1))) {
+                        throw new RuntimeException("Multiple bytecode feature paths exist for class " + matcher.group(1) + "! Second is " + line);
+                    }
+
                     List<String> rest = new ArrayList<>(Arrays.asList(fields));
                     rest.remove(0);
                     map.put(matcher.group(1), new HashSet<>(rest));

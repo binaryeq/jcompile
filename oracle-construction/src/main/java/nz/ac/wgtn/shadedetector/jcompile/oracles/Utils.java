@@ -125,15 +125,16 @@ public class Utils {
 
     /**
      * Organise / index jars in a map, the keys correspond to the GAV of the respective component, represented by file name.
+     * Map keys are ordered by the provided comparator; map element sets have unspecified order.
      * @param jarFolder
      * @param indexingFunction
      * @param comparator
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> index(Path jarFolder, Function<Path,String> indexingFunction,Comparator<String> comparator) throws IOException {
+    public static TreeMap<String,Set<Path>> index(Path jarFolder, Function<Path,String> indexingFunction,Comparator<String> comparator) throws IOException {
         Set<Path> jars = collectJars(jarFolder);
-        Map<String,Set<Path>> indexedJars = comparator==null ? new TreeMap<>() : new TreeMap<>(comparator);
+        TreeMap<String,Set<Path>> indexedJars = comparator==null ? new TreeMap<>() : new TreeMap<>(comparator);
         for (Path jar:jars) {
             String key = indexingFunction.apply(jar);
             indexedJars.computeIfAbsent(key, k -> new TreeSet<>()).add(jar);
@@ -143,63 +144,69 @@ public class Utils {
 
     /**
      * Organise / index jars in a map, the keys correspond to the GAV of the respective component, represented by file name.
+     * Map keys are ordered lexicographically; map element sets have unspecified order.
      * @param jarFolder
      * @param indexingFunction
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> index(Path jarFolder, Function<Path,String> indexingFunction) throws IOException {
+    public static TreeMap<String,Set<Path>> index(Path jarFolder, Function<Path,String> indexingFunction) throws IOException {
         return index(jarFolder,indexingFunction,null);
     }
 
     /**
      * Organise / index jars in a map, the keys are the identifiers for the builds (compiler versions) used.
+     * Map keys are ordered lexicographically; map element sets have unspecified order.
      * @param jarFolder
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> collectJarsByCompilerUsed(Path jarFolder) throws IOException {
+    public static TreeMap<String,Set<Path>> collectJarsByCompilerUsed(Path jarFolder) throws IOException {
         return index(jarFolder, COMPILER_USED);
     }
 
     /**
      * Organise / index jars in a map, the keys are the identifiers for the builds (compiler versions) used.
+     * Map keys are ordered by the provided comparator; map element sets have unspecified order.
      * @param jarFolder
      * @param comparator a custom comparator
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> collectJarsByCompilerUsed(Path jarFolder, Comparator<String> comparator) throws IOException {
+    public static TreeMap<String,Set<Path>> collectJarsByCompilerUsed(Path jarFolder, Comparator<String> comparator) throws IOException {
         return index(jarFolder, COMPILER_USED,comparator);
     }
 
     /**
      * Organise / index jars in a map, the keys correspond to the GAV of the respective component, represented by file name.
+     * Map keys are ordered lexicographically; map element sets have unspecified order.
      * @param jarFolder
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> collectJarsByArtifact(Path jarFolder) throws IOException {
+    public static TreeMap<String,Set<Path>> collectJarsByArtifact(Path jarFolder) throws IOException {
         return index(jarFolder, ARTIFACT);
     }
 
     /**
      * Organise / index jars in a map, the keys correspond to the GA of the respective component, represented by file name ignoring the version part.
+     * Map keys are ordered lexicographically; map element sets have unspecified order.
      * @param jarFolder
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> collectJarsByComponent(Path jarFolder) throws IOException {
+    public static TreeMap<String,Set<Path>> collectJarsByComponent(Path jarFolder) throws IOException {
         return index(jarFolder, COMPONENT_NAME);
     }
 
     /**
      * Organise / index jars in a map, the keys correspond to the GA of the respective component, the build (compiler) and the jar type (regular ("") or "-test"), represented by file name ignoring the version part.
+     * Map keys are ordered lexicographically; map element sets have unspecified order.
      * @param jarFolder
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> collectJarsByComponentAndBuildAndJarType(Path jarFolder) throws IOException {
+    public static TreeMap<String,Set<Path>> collectJarsByComponentAndBuildAndJarType(Path jarFolder) throws IOException {
         return index(jarFolder, f -> COMPILER_USED.apply(f) + "#" + COMPONENT_NAME.apply(f) + "#" + JAR_TYPE.apply(f));
 
     }

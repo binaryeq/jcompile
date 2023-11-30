@@ -15,9 +15,12 @@ open JAVAP, "-|", "javap", "-c", "-v", @ARGV or die;		# Open a pipe from javap, 
 while (<JAVAP>) {
 	if (/^Classfile (.*)/) {
 		outputClass() if defined $currentClass;
-		if (@ARGV && $1 =~ /\Q$ARGV[0]\E$/) {
-			$currentClass = shift;
+		my $newClass = $1;
+		while (@ARGV && $newClass !~ /\Q$ARGV[0]\E$/) {
+			print STDERR "Missing javap output for $ARGV[0] -- presumably it hit an error. Ignoring.\n";
+			shift;
 		}
+		$currentClass = shift;
 		%has = ();
 		$inFunction = 0;
 	} else {
