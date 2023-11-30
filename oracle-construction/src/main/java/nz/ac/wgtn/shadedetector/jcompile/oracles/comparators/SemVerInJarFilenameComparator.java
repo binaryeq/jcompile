@@ -15,7 +15,7 @@ import static nz.ac.wgtn.shadedetector.jcompile.oracles.comparators.SemVer.parse
  */
 public class SemVerInJarFilenameComparator implements Comparator<Path> {
 
-    public static final String SEMVERED_JAR = ".*-\\d+(\\.\\d+(\\.\\d+(\\.\\d+)?)?)?\\.jar";
+    public static final String SEMVERED_JAR = ".*-\\d+(\\.\\d+(\\.\\d+(\\.\\d+)?)?)?(?:-tests)?\\.jar";
     public static final Predicate<String> isSemVeredJar = Pattern.compile(SEMVERED_JAR).asPredicate();
 
     @Override
@@ -26,8 +26,8 @@ public class SemVerInJarFilenameComparator implements Comparator<Path> {
         Preconditions.checkArgument(isSemVeredJar.test(n1));
         Preconditions.checkArgument(isSemVeredJar.test(n2));
 
-        n1 = n1.replace(".jar","");
-        n2 = n2.replace(".jar","");
+        n1 = n1.replace("(?:-tests)?.jar","");
+        n2 = n2.replace("(?:-tests)?.jar","");
 
         String version1 = n1.substring(n1.lastIndexOf("-")+1);
         String version2 = n2.substring(n2.lastIndexOf("-")+1);

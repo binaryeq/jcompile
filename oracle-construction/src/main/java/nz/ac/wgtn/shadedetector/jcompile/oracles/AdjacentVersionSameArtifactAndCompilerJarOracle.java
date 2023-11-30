@@ -21,7 +21,7 @@ public class AdjacentVersionSameArtifactAndCompilerJarOracle implements JarOracl
     @Override
     public List<Pair<Path, Path>> build(Path jarFolder) throws IOException {
 
-        Map<String,Set<Path>> jarsByBuildAndComponent = Utils.collectJarsByComponentAndBuild(jarFolder);
+        Map<String,Set<Path>> jarsByBuildAndComponent = Utils.collectJarsByComponentAndBuildAndJarType(jarFolder);
         List<Pair<Path, Path>> oracle = new ArrayList<>();
         SemVerInJarFilenameComparator comparator = new SemVerInJarFilenameComparator();
 

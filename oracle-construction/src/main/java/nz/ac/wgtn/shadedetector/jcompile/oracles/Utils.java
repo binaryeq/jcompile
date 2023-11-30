@@ -23,9 +23,10 @@ public class Utils {
     public static final Function<Path,String> COMPILER_USED = p -> p.getParent().getFileName().toString();
     public static final Function<Path,String> COMPONENT_NAME = p -> {
         String fileName = p.getFileName().toString();
-        return fileName.substring(0,fileName.lastIndexOf("-"));
+        return fileName.replaceFirst("-[^-]+(?:-tests)?\\.jar$", "");       // Ignore "-tests"
     };
     public static final Function<Path,String> ARTIFACT = p -> p.getFileName().toString();
+    public static final Function<Path,String> JAR_TYPE = p -> p.getFileName().toString().matches(".*-tests\\.jar") ? "-tests" : "";    // Strict check to minimally restrict version syntax
 
     private static final Pattern INNER_CLASS_PATTERN = Pattern.compile("\\$\\d+");
     public static boolean isAnonymousInnerClass (Path p) {
@@ -193,13 +194,13 @@ public class Utils {
     }
 
     /**
-     * Organise / index jars in a map, the keys correspond to the GA of the respective component and the build (compiler), represented by file name ignoring the version part.
+     * Organise / index jars in a map, the keys correspond to the GA of the respective component, the build (compiler) and the jar type (regular ("") or "-test"), represented by file name ignoring the version part.
      * @param jarFolder
      * @return
      * @throws IOException
      */
-    public static Map<String,Set<Path>> collectJarsByComponentAndBuild(Path jarFolder) throws IOException {
-        return index(jarFolder, f -> COMPILER_USED.apply(f) + "#" + COMPONENT_NAME.apply(f));
+    public static Map<String,Set<Path>> collectJarsByComponentAndBuildAndJarType(Path jarFolder) throws IOException {
+        return index(jarFolder, f -> COMPILER_USED.apply(f) + "#" + COMPONENT_NAME.apply(f) + "#" + JAR_TYPE.apply(f));
 
     }
 
