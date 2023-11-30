@@ -26,8 +26,8 @@ public class SemVerInJarFilenameComparator implements Comparator<Path> {
         Preconditions.checkArgument(isSemVeredJar.test(n1));
         Preconditions.checkArgument(isSemVeredJar.test(n2));
 
-        n1 = n1.replace(".jar","");
-        n2 = n2.replace(".jar","");
+        n1 = n1.replace("(?:-tests)?.jar","");
+        n2 = n2.replace("(?:-tests)?.jar","");
 
         String version1 = n1.substring(n1.lastIndexOf("-")+1);
         String version2 = n2.substring(n2.lastIndexOf("-")+1);
