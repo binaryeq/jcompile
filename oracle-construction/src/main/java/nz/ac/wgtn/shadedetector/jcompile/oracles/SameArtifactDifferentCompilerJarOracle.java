@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.index;
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.sorted;
 
 /**
@@ -22,12 +21,12 @@ public class SameArtifactDifferentCompilerJarOracle implements JarOracle {
     @Override
     public List<Pair<Path, Path>> build(Path jarFolder) throws IOException {
 
-        Map<String,Set<Path>> jarsByArtifact = Utils.collectJarsByArtifact(jarFolder);
+        TreeMap<String,Set<Path>> jarsByArtifact = Utils.collectJarsByArtifact(jarFolder);
         List<Pair<Path, Path>> oracle = new ArrayList<>();
         CompilerVersionsComparator versionComparator = new CompilerVersionsComparator();
         ProjectToJDKMajorVersion projectToJDKMajorVersion = new ProjectToJDKMajorVersion();
 
-        for (String artifact : sorted(jarsByArtifact.keySet())) {
+        for (String artifact : jarsByArtifact.keySet()) {
             Map<String, List<Path>> jarsGroupedByCompilerLineageSortedByCompilerVersion = jarsByArtifact.get(artifact).stream()
                 .sorted((f1,f2) -> versionComparator.compare(Utils.COMPILER_USED.apply(f1),Utils.COMPILER_USED.apply(f2)))
                 .collect(Collectors.groupingBy(f1 -> CompilerVersionsComparator.getLineageAndSemVer(Utils.COMPILER_USED.apply(f1))[0]));

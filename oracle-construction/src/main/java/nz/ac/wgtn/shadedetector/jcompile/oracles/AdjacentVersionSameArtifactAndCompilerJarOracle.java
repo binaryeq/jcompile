@@ -5,11 +5,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.sorted;
 
 /**
  * Construct a negative oracle for jars, i.e. sets of jars that originate from different but similar source code (adjacent versions),
@@ -21,7 +20,7 @@ public class AdjacentVersionSameArtifactAndCompilerJarOracle implements JarOracl
     @Override
     public List<Pair<Path, Path>> build(Path jarFolder) throws IOException {
 
-        Map<String,Set<Path>> jarsByBuildAndComponent = Utils.collectJarsByComponentAndBuildAndJarType(jarFolder);
+        TreeMap<String,Set<Path>> jarsByBuildAndComponent = Utils.collectJarsByComponentAndBuildAndJarType(jarFolder);
         List<Pair<Path, Path>> oracle = new ArrayList<>();
         SemVerInJarFilenameComparator comparator = new SemVerInJarFilenameComparator();
 
