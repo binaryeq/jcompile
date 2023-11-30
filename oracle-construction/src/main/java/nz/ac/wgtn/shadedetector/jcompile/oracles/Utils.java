@@ -26,7 +26,7 @@ public class Utils {
         return fileName.replaceFirst("-[^-]+(?:-tests)?\\.jar$", "");       // Ignore "-tests"
     };
     public static final Function<Path,String> ARTIFACT = p -> p.getFileName().toString();
-    public static final Function<Path,String> JAR_TYPE = p -> p.getFileName().toString().matches("-tests.jar$") ? "-tests" : "";    // Strict check to minimally restrict version syntax
+    public static final Function<Path,String> JAR_TYPE = p -> p.getFileName().toString().matches(".*-tests\\.jar") ? "-tests" : "";    // Strict check to minimally restrict version syntax
 
     private static final Pattern INNER_CLASS_PATTERN = Pattern.compile("\\$\\d+");
     public static boolean isAnonymousInnerClass (Path p) {
