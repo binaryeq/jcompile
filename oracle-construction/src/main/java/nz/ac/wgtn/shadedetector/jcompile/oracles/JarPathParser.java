@@ -11,7 +11,6 @@ public record ParsedJarPath (
         @NonNull Compiler compiler,
         @NonNull Project project
 ) {
-
     public record Compiler (
             @NonNull String name,
             @NonNull String majorVersion,
@@ -28,8 +27,12 @@ public record ParsedJarPath (
             return null;
         }
 
-        public static String format(Compiler c) {
-            return c.name() + "-" + c.majorVersion() + (c.minorVersion() == null ? "" : "." + c.minorVersion()) + (c.patchVersion() == null ? "" : "." + c.patchVersion()) + (c.extraConfiguration() == null ? "" : "_" + c.extraConfiguration());
+        public @NonNull String format() {
+            return
+                    name + "-" + majorVersion +
+                    (minorVersion == null ? "" : "." + minorVersion) +
+                    (patchVersion == null ? "" : "." + patchVersion) +
+                    (extraConfiguration == null ? "" : "_" + extraConfiguration);
         }
     }
 
@@ -48,6 +51,14 @@ public record ParsedJarPath (
 
             return null;
         }
+
+        public @NonNull String format() {
+            return
+                    name + "-" + majorVersion +
+                    (minorVersion == null ? "" : "." + minorVersion) +
+                    (patchVersion == null ? "" : "." + patchVersion) +
+                    jarType;
+        }
     }
 
     public static @Nullable ParsedJarPath parse(Path jarPath) {
@@ -58,5 +69,9 @@ public record ParsedJarPath (
         }
 
         return null;
+    }
+
+    public @NonNull String format() {
+        return compiler.format() + "/" + project.format();
     }
 }
