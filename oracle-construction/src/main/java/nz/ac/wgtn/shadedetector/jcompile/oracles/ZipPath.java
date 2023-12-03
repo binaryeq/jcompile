@@ -12,7 +12,8 @@ public record ZipPath (
         String compilerName,
         String compilerMajorVersion,
         String compilerMinorVersion,
-        String compilerPatchVersion,        // Includes underlying OpenJDK version for ECJ builds
+        String compilerPatchVersion,
+        String compilerExtraConfiguration,  // Empty string for OpenJDK builds
         String generatedBy,
         Set<String> bytecodeFeatures,
         String scope)

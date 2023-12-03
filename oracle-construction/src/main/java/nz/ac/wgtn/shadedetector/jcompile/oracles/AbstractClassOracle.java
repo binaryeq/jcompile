@@ -67,9 +67,11 @@ public abstract class AbstractClassOracle implements ClassOracle {
             JarMetadata jarMetadata1 = new JarMetadata(jars.getLeft());
             JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
             String scope = isTestJar(jars.getLeft()) ? "test" : "main";
+            ParsedJarPath parsedJarPath1 = ParsedJarPath.parse(jars.getLeft());
+            ParsedJarPath parsedJarPath2 = ParsedJarPath.parse(jars.getRight());
             for (Path commonClass : sorted(commonClasses)) {
-                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass), jarMetadata1.getBytecodeFeatures(commonClass), scope);
-                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass), jarMetadata2.getBytecodeFeatures(commonClass), scope);
+                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass), parsedJarPath1.compiler().name(), parsedJarPath1.compiler().majorVersion(), parsedJarPath1.compiler().minorVersion(), parsedJarPath1.compiler().patchVersion(), parsedJarPath1.compiler().extraConfiguration(), jarMetadata1.getBytecodeFeatures(commonClass), scope);
+                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass), parsedJarPath2.compiler().name(), parsedJarPath2.compiler().majorVersion(), parsedJarPath2.compiler().minorVersion(), parsedJarPath2.compiler().patchVersion(), parsedJarPath2.compiler().extraConfiguration(), jarMetadata2.getBytecodeFeatures(commonClass), scope);
                 if (includeClassPair(zpath1, zpath2)) {
                     classOracle.add(Pair.of(zpath1, zpath2));
                 }

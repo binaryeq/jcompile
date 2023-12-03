@@ -44,7 +44,7 @@ public record ParsedJarPath (
             @NonNull String jarType     // Either the empty string or "-tests", never null
     ) {
         public static @Nullable Project parse(Path jarPath) {
-            Matcher m = Pattern.compile("([^.]+)-([^-.]+)(?:\\.([^-.]+))?(?:\\.([^-.]+))?(-tests)?\\.jar").matcher(jarPath.getFileName().toString());
+            Matcher m = Pattern.compile("([^.]+)-([^-.]+)(?:\\.([^-.]+))?(?:\\.([^-.]+))?(|-tests)\\.jar").matcher(jarPath.getFileName().toString());
             if (m.matches()) {
                 return new Project(m.group(1), m.group(2), m.group(3), m.group(4), m.group(5));
             }
