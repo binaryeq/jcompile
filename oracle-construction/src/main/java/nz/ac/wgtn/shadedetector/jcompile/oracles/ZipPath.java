@@ -1,10 +1,10 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import com.google.common.collect.Sets;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -24,6 +24,6 @@ public record ZipPath (
         @NonNull Set<Path> allInnerPaths)             // innerPath + paths of all anonymous inner classes
 {
     ZipPath(Path outerPath, Path innerPath, ParsedJarPath.Compiler compiler, JarMetadata jarMetadata, String scope) {
-        this(outerPath, innerPath, compiler.name(), compiler.majorVersion(), compiler.minorVersion(), compiler.patchVersion(), compiler.extraConfiguration(), jarMetadata.getSourceFileOrigin(innerPath), jarMetadata.getBytecodeFeatures(innerPath), scope, Sets.newHashSet(innerPath));
+        this(outerPath, innerPath, compiler.name(), compiler.majorVersion(), compiler.minorVersion(), compiler.patchVersion(), compiler.extraConfiguration(), jarMetadata.getSourceFileOrigin(innerPath), jarMetadata.getBytecodeFeatures(innerPath), scope, Collections.singleton(innerPath));
     }
 }
