@@ -107,7 +107,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
     private static ZipPath combineNamedClassZipPaths(ZipPath a, ZipPath b) {
         return new ZipPath(
                 a.outerPath(),                       // Identical in a and b
-                Stream.of(a, b).min(Comparator.comparing(ZipPath::innerPath)).get().innerPath(),        // Lex min chooses the named class's name over all anonymous classes
+                Stream.of(a, b).min(Comparator.comparing(p -> p.innerPath().toString().replaceFirst("\\.class$", ""))).get().innerPath(),        // Lex min chooses the named class's name over all anonymous classes
                 a.compilerName(),                    // Identical in a and b
                 a.compilerMajorVersion(),            // Identical in a and b
                 a.compilerMinorVersion(),            // Identical in a and b

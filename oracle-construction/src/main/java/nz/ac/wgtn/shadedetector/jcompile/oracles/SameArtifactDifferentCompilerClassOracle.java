@@ -21,7 +21,7 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     }
 
     public SameArtifactDifferentCompilerClassOracle() {
-        super(true,false);
+        super(true,true);
     }
 
     @Override
