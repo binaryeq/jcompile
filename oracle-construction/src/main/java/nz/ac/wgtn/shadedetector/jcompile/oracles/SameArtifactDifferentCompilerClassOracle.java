@@ -1,12 +1,12 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
-import com.google.common.base.Joiner;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Construct a positive oracle for classes, i.e. sets of classes that originate from the same source code,
@@ -35,11 +35,11 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
         List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
-        System.out.println(Joiner.on("\t").join(Arrays.asList(
-                "container1",
-                "container2",
-                "class1",
-                "class2",
+        System.out.println(String.join("\t", Arrays.asList(
+                "container_1",
+                "container_2",
+                "class_1",
+                "class_2",
                 "compiler_name_1",
                 "compiler_name_2",
                 "compiler_major_version_1",
@@ -56,30 +56,34 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                 "bytecode_jep181_2",
                 "bytecode_jep280_1",
                 "bytecode_jep280_2",
-                "scope",
+                "scope_1",
                 "scope_2"
         )));
         for (Pair<ZipPath, ZipPath> paths : oracle) {
-            System.out.println(paths.getLeft().outerPath() +
-                    "\t" + paths.getRight().outerPath() +
-                    "\t" + paths.getLeft().innerPath() +
-                    "\t" + paths.getRight().innerPath() +
-                    "\t" + paths.getLeft().compilerName() +
-                    "\t" + paths.getRight().compilerName() +
-                    "\t" + paths.getLeft().compilerMajorVersion() +
-                    "\t" + paths.getRight().compilerMajorVersion() +
-                    "\t" + paths.getLeft().compilerMinorVersion() +
-                    "\t" + paths.getRight().compilerMinorVersion() +
-                    "\t" + paths.getLeft().compilerExtraConfiguration() +
-                    "\t" + paths.getRight().compilerExtraConfiguration() +
-                    "\t" + paths.getLeft().generatedBy() +
-                    "\t" + paths.getRight().generatedBy() +
-                    "\t" + paths.getLeft().bytecodeFeatures().contains("JEP181") +
-                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP181") +
-                    "\t" + paths.getLeft().bytecodeFeatures().contains("JEP280") +
-                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP280") +
-                    "\t" + paths.getLeft().scope() +
-                    "\t" + paths.getRight().scope());
+            System.out.println(String.join("\t", Stream.of(
+                        paths.getLeft().outerPath(),
+                        paths.getRight().outerPath(),
+                        paths.getLeft().innerPath(),
+                        paths.getRight().innerPath(),
+                        paths.getLeft().compilerName(),
+                        paths.getRight().compilerName(),
+                        paths.getLeft().compilerMajorVersion(),
+                        paths.getRight().compilerMajorVersion(),
+                        paths.getLeft().compilerMinorVersion(),
+                        paths.getRight().compilerMinorVersion(),
+                        paths.getLeft().compilerPatchVersion(),
+                        paths.getRight().compilerPatchVersion(),
+                        paths.getLeft().compilerExtraConfiguration(),
+                        paths.getRight().compilerExtraConfiguration(),
+                        paths.getLeft().generatedBy(),
+                        paths.getRight().generatedBy(),
+                        paths.getLeft().bytecodeFeatures().contains("JEP181"),
+                        paths.getRight().bytecodeFeatures().contains("JEP181"),
+                        paths.getLeft().bytecodeFeatures().contains("JEP280"),
+                        paths.getRight().bytecodeFeatures().contains("JEP280"),
+                        paths.getLeft().scope(),
+                        paths.getRight().scope())
+                    .map(Utils::hyphenateEmpty).toList()));
         }
     }
 

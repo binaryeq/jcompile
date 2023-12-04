@@ -1,6 +1,7 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
 import com.google.common.collect.Sets;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.net.URI;
@@ -221,6 +222,16 @@ public class Utils {
 
     public static FileSystem getJarFileSystem(Path jarPath) throws IOException, URISyntaxException {
         return FileSystems.newFileSystem(new URI("jar:" + jarPath.toUri()), new HashMap<>());
+    }
+
+    // Stringify, converting null or empty string to "-"
+    public static String hyphenateEmpty(@Nullable Object v) {
+        if (v == null) {
+            return "-";
+        } else {
+            String s = v.toString();
+            return s.isEmpty() ? "-" : s;
+        }
     }
 
 }
