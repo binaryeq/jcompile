@@ -1,5 +1,6 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
+import com.google.common.collect.Sets;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -19,9 +20,10 @@ public record ZipPath (
         @Nullable String compilerExtraConfiguration,  // Everything after first "_"; null for OpenJDK builds
         @NonNull String generatedBy,
         @NonNull Set<String> bytecodeFeatures,
-        @NonNull String scope)
+        @NonNull String scope,
+        @NonNull Set<Path> allInnerPaths)             // innerPath + paths of all anonymous inner classes
 {
     ZipPath(Path outerPath, Path innerPath, ParsedJarPath.Compiler compiler, JarMetadata jarMetadata, String scope) {
-        this(outerPath, innerPath, compiler.name(), compiler.majorVersion(), compiler.minorVersion(), compiler.patchVersion(), compiler.extraConfiguration(), jarMetadata.getSourceFileOrigin(innerPath), jarMetadata.getBytecodeFeatures(innerPath), scope);
+        this(outerPath, innerPath, compiler.name(), compiler.majorVersion(), compiler.minorVersion(), compiler.patchVersion(), compiler.extraConfiguration(), jarMetadata.getSourceFileOrigin(innerPath), jarMetadata.getBytecodeFeatures(innerPath), scope, Sets.newHashSet(innerPath));
     }
 }
