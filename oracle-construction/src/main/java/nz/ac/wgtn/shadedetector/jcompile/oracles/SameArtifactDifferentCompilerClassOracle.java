@@ -40,6 +40,14 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                     "\t" + paths.getRight().outerPath() +
                     "\t" + paths.getLeft().innerPath() +
                     "\t" + paths.getRight().innerPath() +
+                    "\t" + paths.getLeft().compilerName() +
+                    "\t" + paths.getRight().compilerName() +
+                    "\t" + paths.getLeft().compilerMajorVersion() +
+                    "\t" + paths.getRight().compilerMajorVersion() +
+                    "\t" + paths.getLeft().compilerMinorVersion() +
+                    "\t" + paths.getRight().compilerMinorVersion() +
+                    "\t" + paths.getLeft().compilerExtraConfiguration() +
+                    "\t" + paths.getRight().compilerExtraConfiguration() +
                     "\t" + paths.getLeft().generatedBy() +
                     "\t" + paths.getRight().generatedBy() +
                     "\t" + paths.getLeft().bytecodeFeatures().contains("JEP181") +
