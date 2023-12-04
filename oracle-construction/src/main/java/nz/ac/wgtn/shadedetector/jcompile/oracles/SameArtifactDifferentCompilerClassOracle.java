@@ -1,5 +1,6 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
@@ -34,7 +35,30 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
         List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
-        System.out.println("container1\tcontainer2\tclass1\tclass2\tgenerated_by_1\tgenerated_by_2\tbytecode_jep181_1\tbytecode_jep181_2\tbytecode_jep280_1\tbytecode_jep280_2\tscope_1\tscope_2");
+        System.out.println(Joiner.on("\t").join(Arrays.asList(
+                "container1",
+                "container2",
+                "class1",
+                "class2",
+                "compiler_name_1",
+                "compiler_name_2",
+                "compiler_major_version_1",
+                "compiler_major_version_2",
+                "compiler_minor_version_1",
+                "compiler_minor_version_2",
+                "compiler_patch_version_1",
+                "compiler_patch_version_2",
+                "compiler_extra_config_1",
+                "compiler_extra_config_2",
+                "generated_by_1",
+                "generated_by_2",
+                "bytecode_jep181_1",
+                "bytecode_jep181_2",
+                "bytecode_jep280_1",
+                "bytecode_jep280_2",
+                "scope",
+                "scope_2"
+        )));
         for (Pair<ZipPath, ZipPath> paths : oracle) {
             System.out.println(paths.getLeft().outerPath() +
                     "\t" + paths.getRight().outerPath() +
