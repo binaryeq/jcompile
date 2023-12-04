@@ -56,6 +56,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
         try {
             Set<Path> classes = Utils.collectClasses(p);
             return classes.stream()
+                    .map(pathWithZipCruft -> Path.of(pathWithZipCruft.toString()))      // Ugh
                     .filter(f -> includeClass(f))
                     .collect(Collectors.groupingBy(Utils::getDeepestNamedClass, Collectors.toSet()));
         } catch (IOException | URISyntaxException e) {
