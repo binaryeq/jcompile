@@ -57,7 +57,9 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                 "bytecode_jep280_1",
                 "bytecode_jep280_2",
                 "scope_1",
-                "scope_2"
+                "scope_2",
+                "n_anon_inner_classes_1",
+                "n_anon_inner_classes_2"
         )));
         for (Pair<ZipPath, ZipPath> paths : oracle) {
             System.out.println(String.join("\t", Stream.of(
@@ -82,7 +84,9 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                         paths.getLeft().bytecodeFeatures().contains("JEP280"),
                         paths.getRight().bytecodeFeatures().contains("JEP280"),
                         paths.getLeft().scope(),
-                        paths.getRight().scope())
+                        paths.getRight().scope(),
+                        paths.getLeft().allInnerPaths().size() - 1,
+                        paths.getRight().allInnerPaths().size() - 1)
                     .map(Utils::hyphenateEmpty).toList()));
         }
     }
