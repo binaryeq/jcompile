@@ -81,7 +81,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
             String scope = isTestJar(jars.get(0)) ? "test" : "main";
             for (Path commonNamedClass : sorted(commonNamedClasses)) {
                 List<ZipPath> zPaths = Stream.of(0, 1)
-                        .map(i -> groupAnonInnerClasses(classes.get(i).get(commonNamedClass), jars.get(i), parsedJarPaths.get(i).compiler(), jarMetadatas.get(i), scope))
+                        .map(i -> groupAnonInnerClasses(classes.get(i).get(commonNamedClass), jars.get(i), parsedJarPaths.get(i).compiler(), parsedJarPaths.get(i).project(), jarMetadatas.get(i), scope))
                         .toList();
                 if (includeClassPair(zPaths.get(0), zPaths.get(1))) {
                     classOracle.add(Pair.of(zPaths.get(0), zPaths.get(1)));
@@ -96,9 +96,9 @@ public abstract class AbstractClassOracle implements ClassOracle {
      * The top-level named class itself should appear in {@code classes} for {@code innerPath} to be set correctly.
      */
 
-    private static ZipPath groupAnonInnerClasses(Set<Path> classes, Path jarPath, ParsedJarPath.Compiler compiler, JarMetadata jarMetadata, String scope) {
+    private static ZipPath groupAnonInnerClasses(Set<Path> classes, Path jarPath, ParsedJarPath.Compiler compiler, ParsedJarPath.Project project, JarMetadata jarMetadata, String scope) {
         return classes.stream()
-                .map(c -> new ZipPath(jarPath, c, compiler, jarMetadata, scope))
+                .map(c -> new ZipPath(jarPath, c, compiler, project, jarMetadata, scope))
                 .reduce(AbstractClassOracle::combineNamedClassZipPaths).get();
     }
 
@@ -115,6 +115,11 @@ public abstract class AbstractClassOracle implements ClassOracle {
         Preconditions.checkArgument(Objects.equals(a.compilerMajorVersion(), b.compilerMajorVersion()));
         Preconditions.checkArgument(Objects.equals(a.compilerMinorVersion(), b.compilerMinorVersion()));
         Preconditions.checkArgument(Objects.equals(a.compilerPatchVersion(), b.compilerPatchVersion()));
+        Preconditions.checkArgument(Objects.equals(a.projectName(), b.projectName()));
+        Preconditions.checkArgument(Objects.equals(a.projectMajorVersion(), b.projectMajorVersion()));
+        Preconditions.checkArgument(Objects.equals(a.projectMinorVersion(), b.projectMinorVersion()));
+        Preconditions.checkArgument(Objects.equals(a.projectPatchVersion(), b.projectPatchVersion()));
+        Preconditions.checkArgument(Objects.equals(a.projectJarType(), b.projectJarType()));
         Preconditions.checkArgument(Objects.equals(a.compilerExtraConfiguration(), b.compilerExtraConfiguration()));
 
         return new ZipPath(
@@ -125,6 +130,11 @@ public abstract class AbstractClassOracle implements ClassOracle {
                 a.compilerMinorVersion(),            // Identical in a and b
                 a.compilerPatchVersion(),            // Identical in a and b
                 a.compilerExtraConfiguration(),      // Identical in a and b
+                a.projectName(),                     // Identical in a and b
+                a.projectMajorVersion(),             // Identical in a and b
+                a.projectMinorVersion(),             // Identical in a and b
+                a.projectPatchVersion(),             // Identical in a and b
+                a.projectJarType(),                  // Identical in a and b
                 Stream.of(a, b).max(Comparator.comparing(ZipPath::generatedBy)).get().generatedBy(),      // Any generated beats non-generated, arbitrary within that
                 Sets.union(a.bytecodeFeatures(), b.bytecodeFeatures()),
                 Stream.of(a, b).min(Comparator.comparing(ZipPath::scope)).get().scope(),    // Arbitrary
