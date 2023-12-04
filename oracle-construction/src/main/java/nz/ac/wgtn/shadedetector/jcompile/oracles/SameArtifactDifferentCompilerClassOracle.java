@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Construct a positive oracle for classes, i.e. sets of classes that originate from the same source code,
@@ -34,20 +35,55 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
         List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
-        System.out.println("container1\tcontainer2\tclass1\tclass2\tgenerated_by_1\tgenerated_by_2\tbytecode_jep181_1\tbytecode_jep181_2\tbytecode_jep280_1\tbytecode_jep280_2\tscope_1\tscope_2");
+        System.out.println(String.join("\t", Arrays.asList(
+                "container_1",
+                "container_2",
+                "class_1",
+                "class_2",
+                "compiler_name_1",
+                "compiler_name_2",
+                "compiler_major_version_1",
+                "compiler_major_version_2",
+                "compiler_minor_version_1",
+                "compiler_minor_version_2",
+                "compiler_patch_version_1",
+                "compiler_patch_version_2",
+                "compiler_extra_config_1",
+                "compiler_extra_config_2",
+                "generated_by_1",
+                "generated_by_2",
+                "bytecode_jep181_1",
+                "bytecode_jep181_2",
+                "bytecode_jep280_1",
+                "bytecode_jep280_2",
+                "scope_1",
+                "scope_2"
+        )));
         for (Pair<ZipPath, ZipPath> paths : oracle) {
-            System.out.println(paths.getLeft().outerPath() +
-                    "\t" + paths.getRight().outerPath() +
-                    "\t" + paths.getLeft().innerPath() +
-                    "\t" + paths.getRight().innerPath() +
-                    "\t" + paths.getLeft().generatedBy() +
-                    "\t" + paths.getRight().generatedBy() +
-                    "\t" + paths.getLeft().bytecodeFeatures().contains("JEP181") +
-                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP181") +
-                    "\t" + paths.getLeft().bytecodeFeatures().contains("JEP280") +
-                    "\t" + paths.getRight().bytecodeFeatures().contains("JEP280") +
-                    "\t" + paths.getLeft().scope() +
-                    "\t" + paths.getRight().scope());
+            System.out.println(String.join("\t", Stream.of(
+                        paths.getLeft().outerPath(),
+                        paths.getRight().outerPath(),
+                        paths.getLeft().innerPath(),
+                        paths.getRight().innerPath(),
+                        paths.getLeft().compilerName(),
+                        paths.getRight().compilerName(),
+                        paths.getLeft().compilerMajorVersion(),
+                        paths.getRight().compilerMajorVersion(),
+                        paths.getLeft().compilerMinorVersion(),
+                        paths.getRight().compilerMinorVersion(),
+                        paths.getLeft().compilerPatchVersion(),
+                        paths.getRight().compilerPatchVersion(),
+                        paths.getLeft().compilerExtraConfiguration(),
+                        paths.getRight().compilerExtraConfiguration(),
+                        paths.getLeft().generatedBy(),
+                        paths.getRight().generatedBy(),
+                        paths.getLeft().bytecodeFeatures().contains("JEP181"),
+                        paths.getRight().bytecodeFeatures().contains("JEP181"),
+                        paths.getLeft().bytecodeFeatures().contains("JEP280"),
+                        paths.getRight().bytecodeFeatures().contains("JEP280"),
+                        paths.getLeft().scope(),
+                        paths.getRight().scope())
+                    .map(Utils::hyphenateEmpty).toList()));
         }
     }
 

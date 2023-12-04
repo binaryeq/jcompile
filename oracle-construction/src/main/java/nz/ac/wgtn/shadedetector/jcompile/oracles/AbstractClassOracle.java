@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.*;
 
@@ -49,29 +50,37 @@ public abstract class AbstractClassOracle implements ClassOracle {
         return true;
     }
 
-    protected Set<Path> getClasses(Path p) throws IOException, URISyntaxException {
-        Set<Path> classes = Utils.collectClasses(p);
-        return classes.stream()
-            .filter(f -> includeClass(f))
-            .collect(Collectors.toSet());
+    protected Set<Path> getClasses(Path p) {
+        try {
+            Set<Path> classes = Utils.collectClasses(p);
+            return classes.stream()
+                    .filter(f -> includeClass(f))
+                    .collect(Collectors.toSet());
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException("Hit exception, see cause", e);
+        }
     }
 
     protected List<Pair<ZipPath, ZipPath>> buildFromJarPairs(List<Pair<Path, Path>> jarOracle) throws IOException, URISyntaxException {
         List<Pair<ZipPath, ZipPath>> classOracle = new ArrayList<>();
 
-        for (Pair<Path,Path> jars: jarOracle) {
-            System.err.println("analysing: " + jars.getLeft().toString() + " vs " + jars.getRight().toString());
-            Set<Path> classes1 = getClasses(jars.getLeft());
-            Set<Path> classes2 = getClasses(jars.getRight());
-            Set<Path> commonClasses = findCommonPaths(classes1,classes2);
-            JarMetadata jarMetadata1 = new JarMetadata(jars.getLeft());
-            JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
-            String scope = isTestJar(jars.getLeft()) ? "test" : "main";
+        for (Pair<Path,Path> jarPair: jarOracle) {
+            System.err.println("analysing: " + jarPair.getLeft().toString() + " vs " + jarPair.getRight().toString());
+
+            // These lists all have 2 elements
+            List<Path> jars = List.of(jarPair.getLeft(), jarPair.getRight());
+            List<Set<Path>> classes = jars.stream().map(this::getClasses).toList();
+            List<JarMetadata> jarMetadatas = jars.stream().map(JarMetadata::new).toList();
+            List<ParsedJarPath> parsedJarPaths = jars.stream().map(ParsedJarPath::parse).toList();
+
+            Set<Path> commonClasses = findCommonPaths(classes.get(0), classes.get(1));
+            String scope = isTestJar(jars.get(0)) ? "test" : "main";
             for (Path commonClass : sorted(commonClasses)) {
-                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass), jarMetadata1.getBytecodeFeatures(commonClass), scope);
-                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass), jarMetadata2.getBytecodeFeatures(commonClass), scope);
-                if (includeClassPair(zpath1, zpath2)) {
-                    classOracle.add(Pair.of(zpath1, zpath2));
+                List<ZipPath> zPaths = Stream.of(0, 1)
+                        .map(i -> new ZipPath(jars.get(i), commonClass, parsedJarPaths.get(i).compiler(), jarMetadatas.get(i), scope))
+                        .toList();
+                if (includeClassPair(zPaths.get(0), zPaths.get(1))) {
+                    classOracle.add(Pair.of(zPaths.get(0), zPaths.get(1)));
                 }
             }
         }
