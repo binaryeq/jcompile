@@ -18,12 +18,35 @@ public record ZipPath (
         @Nullable String compilerMinorVersion,
         @Nullable String compilerPatchVersion,
         @Nullable String compilerExtraConfiguration,  // Everything after first "_"; null for OpenJDK builds
+        @NonNull String projectName,
+        @NonNull String projectMajorVersion,
+        @Nullable String projectMinorVersion,
+        @Nullable String projectPatchVersion,
+        @NonNull String projectJarType,
+
         @NonNull String generatedBy,
         @NonNull Set<String> bytecodeFeatures,
         @NonNull String scope,
         @NonNull Set<Path> allInnerPaths)             // innerPath + paths of all anonymous inner classes
 {
-    ZipPath(Path outerPath, Path innerPath, ParsedJarPath.Compiler compiler, JarMetadata jarMetadata, String scope) {
-        this(outerPath, innerPath, compiler.name(), compiler.majorVersion(), compiler.minorVersion(), compiler.patchVersion(), compiler.extraConfiguration(), jarMetadata.getSourceFileOrigin(innerPath), jarMetadata.getBytecodeFeatures(innerPath), scope, Collections.singleton(innerPath));
+    ZipPath(Path outerPath, Path innerPath, ParsedJarPath.Compiler compiler, ParsedJarPath.Project project, JarMetadata jarMetadata, String scope) {
+        this(
+                outerPath,
+                innerPath,
+                compiler.name(),
+                compiler.majorVersion(),
+                compiler.minorVersion(),
+                compiler.patchVersion(),
+                compiler.extraConfiguration(),
+                project.name(),
+                project.majorVersion(),
+                project.minorVersion(),
+                project.patchVersion(),
+                project.jarType(),
+                jarMetadata.getSourceFileOrigin(innerPath),
+                jarMetadata.getBytecodeFeatures(innerPath),
+                scope,
+                Collections.singleton(innerPath)
+        );
     }
 }
