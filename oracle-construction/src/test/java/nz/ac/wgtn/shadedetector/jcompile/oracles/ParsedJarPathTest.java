@@ -71,7 +71,7 @@ class ParsedJarPathTest {
     }
 
     @Test
-    public void testParsedJarPath_parseHorribleEcj() {
+    public void testParsedJarPath_parsePatchVersionWithPeriodsAndHyphens() {
         Path p = Path.of("jars/ecj-3.11.1.v20150902-1521_openjdk-11.0.19/commons-codec-1.11.jar");
 
         ParsedJarPath result = ParsedJarPath.parse(p);
@@ -88,7 +88,28 @@ class ParsedJarPathTest {
         assertEquals("1", result.project().majorVersion());
         assertEquals("11", result.project().minorVersion());
         assertNull(result.project().patchVersion());
-        assertEquals("-tests", result.project().jarType());
+        assertEquals("", result.project().jarType());
+    }
+
+    @Test
+    public void testParsedJarPath_parseMulticomponentNamePatchVersionWithPeriodsAndHyphens() {
+        Path p = Path.of("jars/multi-component-name-3.11.1.v20150902-1521_openjdk-11.0.19/commons-codec-1.11.jar");
+
+        ParsedJarPath result = ParsedJarPath.parse(p);
+
+        assertNotNull(result);
+        assertNotNull(result.compiler());
+        assertEquals("multi-component-name", result.compiler().name());
+        assertEquals("3", result.compiler().majorVersion());
+        assertEquals("11", result.compiler().minorVersion());
+        assertEquals("1.v20150902-1521", result.compiler().patchVersion());
+        assertEquals("openjdk-11.0.19", result.compiler().extraConfiguration());
+        assertNotNull(result.compiler());
+        assertEquals("commons-codec", result.project().name());
+        assertEquals("1", result.project().majorVersion());
+        assertEquals("11", result.project().minorVersion());
+        assertNull(result.project().patchVersion());
+        assertEquals("", result.project().jarType());
     }
 
 }

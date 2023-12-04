@@ -19,7 +19,9 @@ public record ParsedJarPath (
             @Nullable String extraConfiguration
     ) {
         public static @Nullable Compiler parse(Path pathToDirContainingJar) {
-            Matcher m = Pattern.compile("([^._]+)-([^-._]+)(?:\\.([^-._]+))?(?:\\.([^-._]+))?(?:_(.+))?").matcher(pathToDirContainingJar.getFileName().toString());
+            // Tricky: Allow "." and "-" in the patch version, to handle paths like "ecj-3.11.1.v20150902-1521_openjdk-11.0.19".
+            // The fact that the major version is mandatory should make hyphens still "stick to" the name whenever possible, as desired.
+            Matcher m = Pattern.compile("([^._]+)-([^-._]+)(?:\\.([^-._]+))?(?:\\.([^_]+))?(?:_(.+))?").matcher(pathToDirContainingJar.getFileName().toString());
             if (m.matches()) {
                 return new Compiler(m.group(1), m.group(2), m.group(3), m.group(4), m.group(5));
             }
