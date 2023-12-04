@@ -1,5 +1,6 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -56,7 +57,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
         try {
             Set<Path> classes = Utils.collectClasses(p);
             return classes.stream()
-                    .map(pathWithZipCruft -> Path.of(pathWithZipCruft.toString()))      // Ugh
+                    .map(pathWithZipCruft -> Path.of(pathWithZipCruft.toString()))      // Important to strip out hidden FileSystem part of Path, ugh
                     .filter(f -> includeClass(f))
                     .collect(Collectors.groupingBy(Utils::getDeepestNamedClass, Collectors.toSet()));
         } catch (IOException | URISyntaxException e) {
@@ -102,12 +103,23 @@ public abstract class AbstractClassOracle implements ClassOracle {
     }
 
     /**
-     * Combine metadata for a named class and all of its anonymous inner classes.
+     * Combine metadata for a named class and all of its anonymous inner classes, preferring a named {@code innerClass}
+     * to any anonymous inner class {@code innerClass}.
+     *
+     * The two arguments must have identical {@code outerPath}, {@code compilerName}, {@code compilerMajorVersion},
+     * {@code compilerMinorVersion}, {@code compilerPatchVersion}, {@code compilerExtraConfiguration}.
      */
     private static ZipPath combineNamedClassZipPaths(ZipPath a, ZipPath b) {
+        Preconditions.checkArgument(Objects.equals(a.outerPath(), b.outerPath()));
+        Preconditions.checkArgument(Objects.equals(a.compilerName(), b.compilerName()));
+        Preconditions.checkArgument(Objects.equals(a.compilerMajorVersion(), b.compilerMajorVersion()));
+        Preconditions.checkArgument(Objects.equals(a.compilerMinorVersion(), b.compilerMinorVersion()));
+        Preconditions.checkArgument(Objects.equals(a.compilerPatchVersion(), b.compilerPatchVersion()));
+        Preconditions.checkArgument(Objects.equals(a.compilerExtraConfiguration(), b.compilerExtraConfiguration()));
+
         return new ZipPath(
                 a.outerPath(),                       // Identical in a and b
-                Stream.of(a, b).min(Comparator.comparing(p -> p.innerPath().toString().replaceFirst("\\.class$", ""))).get().innerPath(),        // Lex min chooses the named class's name over all anonymous classes
+                Stream.of(a, b).min(Comparator.comparing(p -> p.innerPath().toString().replaceFirst("\\.class$", ""))).get().innerPath(),   // Choose the named class over all anonymous classes
                 a.compilerName(),                    // Identical in a and b
                 a.compilerMajorVersion(),            // Identical in a and b
                 a.compilerMinorVersion(),            // Identical in a and b
