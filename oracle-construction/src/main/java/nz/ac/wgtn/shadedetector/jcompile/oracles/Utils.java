@@ -39,6 +39,13 @@ public class Utils {
     }
 
     /**
+     * Strips any anonymous inner class part from a {@code .class} or {@code .java} filename.
+     */
+    public static Path getDeepestNamedClass(Path p) {
+        return p.getParent().resolve(p.getFileName().toString().replaceFirst("\\$\\d[^.]*", ""));
+    }
+
+    /**
      * Strips any inner class part (anonymous or not) from a {@code .class} or {@code .java} filename.
      */
     public static Path getTopLevelClass(Path p) {
@@ -91,9 +98,9 @@ public class Utils {
         return classFiles;
     }
 
-    public static byte[] read(ZipPath zipPath) throws IOException, URISyntaxException {
-        try (FileSystem zipfs = getJarFileSystem(zipPath.outerPath())) {
-            Path entry = zipfs.getPath(zipPath.innerPath().toString());
+    public static byte[] read(Path jarPath, Path innerPath) throws IOException, URISyntaxException {
+        try (FileSystem zipfs = getJarFileSystem(jarPath)) {
+            Path entry = zipfs.getPath(innerPath.toString());
             return Files.readAllBytes(entry);
         }
     }
