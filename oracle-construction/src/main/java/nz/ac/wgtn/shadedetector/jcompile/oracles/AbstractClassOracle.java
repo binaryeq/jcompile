@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static nz.ac.wgtn.shadedetector.jcompile.oracles.Utils.*;
 
@@ -49,36 +51,47 @@ public abstract class AbstractClassOracle implements ClassOracle {
         return true;
     }
 
-    protected Set<Path> getClasses(Path p) throws IOException, URISyntaxException {
-        Set<Path> classes = Utils.collectClasses(p);
-        return classes.stream()
-            .filter(f -> includeClass(f))
-            .collect(Collectors.toSet());
+    protected Set<Path> getClasses(Path p) {
+        try {
+            Set<Path> classes = Utils.collectClasses(p);
+            return classes.stream()
+                    .filter(f -> includeClass(f))
+                    .collect(Collectors.toSet());
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException("Hit exception, see cause", e);
+        }
     }
 
     protected List<Pair<ZipPath, ZipPath>> buildFromJarPairs(List<Pair<Path, Path>> jarOracle) throws IOException, URISyntaxException {
         List<Pair<ZipPath, ZipPath>> classOracle = new ArrayList<>();
 
-        for (Pair<Path,Path> jars: jarOracle) {
-            System.err.println("analysing: " + jars.getLeft().toString() + " vs " + jars.getRight().toString());
-            Set<Path> classes1 = getClasses(jars.getLeft());
-            Set<Path> classes2 = getClasses(jars.getRight());
-            Set<Path> commonClasses = findCommonPaths(classes1,classes2);
-            JarMetadata jarMetadata1 = new JarMetadata(jars.getLeft());
-            JarMetadata jarMetadata2 = new JarMetadata(jars.getRight());
-            String scope = isTestJar(jars.getLeft()) ? "test" : "main";
-            ParsedJarPath parsedJarPath1 = ParsedJarPath.parse(jars.getLeft());
-            ParsedJarPath parsedJarPath2 = ParsedJarPath.parse(jars.getRight());
+        for (Pair<Path,Path> jarPair: jarOracle) {
+            System.err.println("analysing: " + jarPair.getLeft().toString() + " vs " + jarPair.getRight().toString());
+
+            // These arrays all have 2 elements
+            Path[] jars = List.of(jarPair.getLeft(), jarPair.getRight()).toArray(new Path[0]);
+            Set<Path>[] classes = Arrays.stream(jars).map(this::getClasses).toList().toArray(new Set[0]);
+            JarMetadata[] jarMetadatas = Arrays.stream(jars).map(JarMetadata::new).toList().toArray(new JarMetadata[0]);
+            ParsedJarPath[] parsedJarPaths = Arrays.stream(jars).map(ParsedJarPath::parse).toList().toArray(new ParsedJarPath[0]);
+
+            Set<Path> commonClasses = findCommonPaths(classes[0], classes[1]);
+            String scope = isTestJar(jars[0]) ? "test" : "main";
             for (Path commonClass : sorted(commonClasses)) {
-                ZipPath zpath1 = new ZipPath(jars.getLeft(), commonClass, jarMetadata1.getSourceFileOrigin(commonClass), parsedJarPath1.compiler().name(), parsedJarPath1.compiler().majorVersion(), parsedJarPath1.compiler().minorVersion(), parsedJarPath1.compiler().patchVersion(), parsedJarPath1.compiler().extraConfiguration(), jarMetadata1.getBytecodeFeatures(commonClass), scope);
-                ZipPath zpath2 = new ZipPath(jars.getRight(), commonClass, jarMetadata2.getSourceFileOrigin(commonClass), parsedJarPath2.compiler().name(), parsedJarPath2.compiler().majorVersion(), parsedJarPath2.compiler().minorVersion(), parsedJarPath2.compiler().patchVersion(), parsedJarPath2.compiler().extraConfiguration(), jarMetadata2.getBytecodeFeatures(commonClass), scope);
-                if (includeClassPair(zpath1, zpath2)) {
-                    classOracle.add(Pair.of(zpath1, zpath2));
+                ZipPath[] zPaths = Stream.of(0, 1)
+                        .map(i -> new ZipPath(jars[i], commonClass, parsedJarPaths[i].compiler(), jarMetadatas[i], scope))
+                        .toList().toArray(new ZipPath[0]);
+                if (includeClassPair(zPaths[0], zPaths[1])) {
+                    classOracle.add(Pair.of(zPaths[0], zPaths[1]));
                 }
             }
         }
 
         return classOracle;
+    }
+
+    private static <T, R> R[] mapArray(T[] input, Function<T, R> f) {
+//        return Arrays.stream(input).map(f).toList().toArray(new R[0]);
+        return (R[]) Arrays.stream(input).map(f).toList().toArray();
     }
 
     // whether to include this class reference in the oracle
