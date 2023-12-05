@@ -25,16 +25,20 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     }
 
     @Override
-    public List<Pair<ZipPath, ZipPath>> build(Path jarFolder) throws IOException, URISyntaxException {
+    public List<ClassOracleRow> build(Path jarFolder) throws IOException, URISyntaxException {
 
         List<Pair<Path,Path>> jarOracle = new SameArtifactDifferentCompilerJarOracle().build(jarFolder);
-        return buildFromJarPairs(jarOracle);
+        return buildFromJarPairs(jarOracle, SameArtifactDifferentCompilerClassOracle::makeRow);
+    }
+
+    private static SameArtifactDifferentCompilerClassOracleRow makeRow(Pair<ZipPath, ZipPath> zPaths) {
+        return new SameArtifactDifferentCompilerClassOracleRow(zPaths);
     }
 
     //    // for testing TODO: remove
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
-        List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
+        List<ClassOracleRow> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);     //TODO: Use more specific type
         System.out.println(String.join("\t", Arrays.asList(
                 "container_1",
                 "container_2",
@@ -65,7 +69,7 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                 "n_anon_inner_classes_1",
                 "n_anon_inner_classes_2"
         )));
-        for (Pair<ZipPath, ZipPath> paths : oracle) {
+        for (ClassOracleRow paths : oracle) {
             System.out.println(String.join("\t", Stream.of(
                         paths.getLeft().outerPath(),
                         paths.getRight().outerPath(),

@@ -24,16 +24,20 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
     }
 
     @Override
-    public List<Pair<ZipPath, ZipPath>> build(Path jarFolder) throws IOException, URISyntaxException {
+    public List<ClassOracleRow> build(Path jarFolder) throws IOException, URISyntaxException {
 
         List<Pair<Path,Path>> jarOracle = new AdjacentVersionSameArtifactAndCompilerJarOracle().build(jarFolder);
-        return buildFromJarPairs(jarOracle);
+        return buildFromJarPairs(jarOracle, AdjacentVersionSameArtifactAndCompilerClassOracle::makeRow);
+    }
+
+    private static AdjacentVersionSameArtifactAndCompilerClassOracleRow makeRow(Pair<ZipPath, ZipPath> zPaths) {
+        return new AdjacentVersionSameArtifactAndCompilerClassOracleRow(zPaths);
     }
 
     //    // for testing TODO: remove
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
-        List<Pair<ZipPath, ZipPath>> oracle = new AdjacentVersionSameArtifactAndCompilerClassOracle().build(jarFolder);
+        List<ClassOracleRow> oracle = new AdjacentVersionSameArtifactAndCompilerClassOracle().build(jarFolder);     //TODO: Use more specific type
         System.out.println(String.join("\t", Arrays.asList(
                 "container_1",
                 "container_2",
@@ -62,7 +66,7 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
                 "n_anon_inner_classes_1",
                 "n_anon_inner_classes_2"
         )));
-        for (Pair<ZipPath, ZipPath> paths : oracle) {
+        for (ClassOracleRow paths : oracle) {
             System.out.println(String.join("\t", Stream.of(
                     paths.getLeft().outerPath(),
                     paths.getRight().outerPath(),

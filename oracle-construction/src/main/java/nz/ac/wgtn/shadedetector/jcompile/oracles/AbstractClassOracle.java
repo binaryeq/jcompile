@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,8 +66,8 @@ public abstract class AbstractClassOracle implements ClassOracle {
         }
     }
 
-    protected List<Pair<ZipPath, ZipPath>> buildFromJarPairs(List<Pair<Path, Path>> jarOracle) throws IOException, URISyntaxException {
-        List<Pair<ZipPath, ZipPath>> classOracle = new ArrayList<>();
+    protected <R extends ClassOracleRow> List<R> buildFromJarPairs(List<Pair<Path, Path>> jarOracle, Function<Pair<ZipPath, ZipPath>, R> makeRow) throws IOException, URISyntaxException {
+        List<R> classOracle = new ArrayList<>();
 
         for (Pair<Path,Path> jarPair: jarOracle) {
             System.err.println("analysing: " + jarPair.getLeft().toString() + " vs " + jarPair.getRight().toString());
@@ -84,7 +85,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
                         .map(i -> groupAnonInnerClasses(classes.get(i).get(commonNamedClass), jars.get(i), parsedJarPaths.get(i).compiler(), parsedJarPaths.get(i).project(), jarMetadatas.get(i), scope))
                         .toList();
                 if (includeClassPair(zPaths.get(0), zPaths.get(1))) {
-                    classOracle.add(Pair.of(zPaths.get(0), zPaths.get(1)));
+                    classOracle.add(makeRow.apply(Pair.of(zPaths.get(0), zPaths.get(1))));
                 }
             }
         }
