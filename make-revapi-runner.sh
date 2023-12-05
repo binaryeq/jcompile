@@ -14,13 +14,15 @@ else
 fi
 
 MINSEVERITY="${1:-BREAKING}"
-REVAPI_CMD="revapi.sh --extensions=org.revapi:revapi-java:0.28.1,org.revapi:revapi-reporter-json:0.5.0 -Drevapi.reporter.json.minSeverity=$MINSEVERITY"
+REVAPI_BASE_CMD="revapi.sh --extensions=org.revapi:revapi-java:0.28.1,org.revapi:revapi-reporter-json:0.5.0 -Drevapi.reporter.json.minSeverity"		# Must be followed by, e.g., "=BREAKING"
 
 if [ $MODE = make ]
 then
 	echo "all:"		# Make defaults to first goal
-	echo ""
-	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { my $fn = "$1__vs__$3.revapi.'$MINSEVERITY'.json"; print "$fn:\n\t'"$REVAPI_CMD"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=\$\@\nall: $fn\n"; }'
+	echo
+	echo "MINSEVERITY := $MINSEVERITY"		# So the value passed to this script becomes the default, but it can be overridden at make time
+	echo
+	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { my $fn = "$1__vs__$3.revapi.\$(MINSEVERITY).json"; print "$fn:\n\t'"$REVAPI_BASE_CMD"'=\$(MINSEVERITY) --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=\$\@\nall: $fn\n"; }'
 else
-	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { print "'"$REVAPI_CMD"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=$1__vs__$3.revapi.'$MINSEVERITY'.json"; }'
+	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { print "'"$REVAPI_BASE_CMD=$MINSEVERITY"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=$1__vs__$3.revapi.'$MINSEVERITY'.json"; }'
 fi
