@@ -131,8 +131,8 @@ if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	# At least some projects also create a jar containing compiled tests -- get that too.
 	TEST_JAR_PATH="${WORKTREE_HOST}/target/${JAR_NAME%%.jar}-tests.jar"
 	if test -f $TEST_JAR_PATH; then
-		echo "Found tests jar $TEST_JAR_PATH, copying that also."
-		cp "$TEST_JAR_PATH" "$RESULT_FOLDER"
+		echo "Found tests jar $TEST_JAR_PATH, copying that also but stripping out non-class files."
+		./keep-only-classes-in-jar.sh "$TEST_JAR_PATH" "$RESULT_FOLDER/${TEST_JAR_PATH##*/}"
 	fi
 
 	# Gather some additional metadata
