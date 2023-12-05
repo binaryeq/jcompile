@@ -3,7 +3,24 @@
 # Input on stdin should consist of the logging output of AdjacentVersionSameArtifactAndCompilerClassOracle (lines of the form "analysing XYZ.jar vs ABC.jar").
 # Outputs a shell script to stdout that will run revapi on each mentioned pair of jars and store the JSON output in a file that mentions both jars' versions.
 # Optionally supply a minimum severity (EQUIVALENT, NON_BREAKING, POTENTIALLY_BREAKING or BREAKING (the default)) on the command line.
+# If the first argument is --output-makefile, a Makefile will be written instead of a shell script. This can make continuing incomplete runs and running in parallel easier.
+
+if [ "$1" = "--output-makefile" ]
+then
+	MODE=make
+	shift
+else
+	MODE=script
+fi
 
 MINSEVERITY="${1:-BREAKING}"
+REVAPI_CMD="revapi.sh --extensions=org.revapi:revapi-java:0.28.1,org.revapi:revapi-reporter-json:0.5.0 -Drevapi.reporter.json.minSeverity=$MINSEVERITY"
 
-perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { print "revapi.sh --extensions=org.revapi:revapi-java:0.28.1,org.revapi:revapi-reporter-json:0.5.0 --old=$1.jar --new=$2.jar -Drevapi.reporter.json.minSeverity=$MINSEVERITY -Drevapi.reporter.json.output=$1__vs__$3.revapi.$MINSEVERITY.json"; }' > run_revapi_on_all_relevant_pairs.sh
+if [ $MODE = make ]
+then
+	echo "all:"		# Make defaults to first goal
+	echo ""
+	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { my $fn = "$1__vs__$3.revapi.'$MINSEVERITY'.json"; print "$fn:\n\t'"$REVAPI_CMD"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=\$\@\nall: $fn\n"; }'
+else
+	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { print "'"$REVAPI_CMD"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=$1__vs__$3.revapi.'$MINSEVERITY'.json"; }'
+fi
