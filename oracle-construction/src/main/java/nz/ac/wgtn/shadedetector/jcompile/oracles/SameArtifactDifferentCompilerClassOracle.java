@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Construct a positive oracle for classes, i.e. sets of classes that originate from the same source code,
@@ -70,36 +69,7 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                 "n_anon_inner_classes_2"
         )));
         for (ClassOracleRow paths : oracle) {
-            System.out.println(String.join("\t", Stream.of(
-                        paths.getLeft().outerPath(),
-                        paths.getRight().outerPath(),
-                        paths.getLeft().innerPath(),
-                        paths.getRight().innerPath(),
-                        paths.getLeft().compilerName(),
-                        paths.getRight().compilerName(),
-                        paths.getLeft().compilerMajorVersion(),
-                        paths.getRight().compilerMajorVersion(),
-                        paths.getLeft().compilerMinorVersion(),
-                        paths.getRight().compilerMinorVersion(),
-                        paths.getLeft().compilerPatchVersion(),
-                        paths.getRight().compilerPatchVersion(),
-                        paths.getLeft().compilerExtraConfiguration(),
-                        paths.getRight().compilerExtraConfiguration(),
-                        paths.getLeft().projectName(),
-                        paths.getLeft().projectMajorVersion(),
-                        paths.getLeft().projectMinorVersion(),
-                        paths.getLeft().projectPatchVersion(),
-                        paths.getLeft().generatedBy(),
-                        paths.getRight().generatedBy(),
-                        paths.getLeft().bytecodeFeatures().contains("JEP181"),
-                        paths.getRight().bytecodeFeatures().contains("JEP181"),
-                        paths.getLeft().bytecodeFeatures().contains("JEP280"),
-                        paths.getRight().bytecodeFeatures().contains("JEP280"),
-                        paths.getLeft().scope(),
-                        paths.getRight().scope(),
-                        paths.getLeft().allInnerPaths().size() - 1,
-                        paths.getRight().allInnerPaths().size() - 1)
-                    .map(Utils::hyphenateEmpty).toList()));
+            paths.printRow(System.out);
         }
     }
 

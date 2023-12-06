@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Construct a negative oracle for classes, i.e. sets of classes that originate from different but similar source code (adjacent versions),
@@ -67,34 +66,7 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
                 "n_anon_inner_classes_2"
         )));
         for (ClassOracleRow paths : oracle) {
-            System.out.println(String.join("\t", Stream.of(
-                    paths.getLeft().outerPath(),
-                    paths.getRight().outerPath(),
-                    paths.getLeft().innerPath(),
-                    paths.getRight().innerPath(),
-                    paths.getLeft().compilerName(),
-                    paths.getLeft().compilerMajorVersion(),
-                    paths.getLeft().compilerMinorVersion(),
-                    paths.getLeft().compilerPatchVersion(),
-                    paths.getLeft().compilerExtraConfiguration(),
-                    paths.getLeft().projectName(),
-                    paths.getLeft().projectMajorVersion(),
-                    paths.getRight().projectMajorVersion(),
-                    paths.getLeft().projectMinorVersion(),
-                    paths.getRight().projectMinorVersion(),
-                    paths.getLeft().projectPatchVersion(),
-                    paths.getRight().projectPatchVersion(),
-                    paths.getLeft().generatedBy(),
-                    paths.getRight().generatedBy(),
-                    paths.getLeft().bytecodeFeatures().contains("JEP181"),
-                    paths.getRight().bytecodeFeatures().contains("JEP181"),
-                    paths.getLeft().bytecodeFeatures().contains("JEP280"),
-                    paths.getRight().bytecodeFeatures().contains("JEP280"),
-                    paths.getLeft().scope(),
-                    paths.getRight().scope(),
-                    paths.getLeft().allInnerPaths().size() - 1,
-                    paths.getRight().allInnerPaths().size() - 1)
-                .map(Utils::hyphenateEmpty).toList()));
+            paths.printRow(System.out);
         }
     }
 
