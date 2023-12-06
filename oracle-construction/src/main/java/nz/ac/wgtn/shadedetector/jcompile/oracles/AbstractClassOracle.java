@@ -71,6 +71,7 @@ public abstract class AbstractClassOracle implements ClassOracle {
 
         for (Pair<Path,Path> jarPair: jarOracle) {
             System.err.println("analysing: " + jarPair.getLeft().toString() + " vs " + jarPair.getRight().toString());
+            processJarPair(jarPair);        // Subclasses can do arbitrary per-jar-pair processing here
 
             // These lists all have 2 elements
             List<Path> jars = List.of(jarPair.getLeft(), jarPair.getRight());
@@ -91,6 +92,13 @@ public abstract class AbstractClassOracle implements ClassOracle {
         }
 
         return classOracle;
+    }
+
+    /**
+     * A slot for subclasses to do per-jar-pair processing during {@link #buildFromJarPairs(List, Function)}.
+     */
+    protected void processJarPair(Pair<Path, Path> jarPair) {
+        // Does nothing by default
     }
 
     /**

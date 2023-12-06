@@ -21,8 +21,12 @@ then
 	echo "all:"		# Make defaults to first goal
 	echo
 	echo "MINSEVERITY := $MINSEVERITY"		# So the value passed to this script becomes the default, but it can be overridden at make time
+	echo "JCOMPILE_ROOT := $(git rev-parse --show-toplevel)"
 	echo
-	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { my $fn = "$1__vs__$3.revapi.\$(MINSEVERITY).json"; print "$fn:\n\t'"$REVAPI_BASE_CMD"'=\$(MINSEVERITY) --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=\$\@\nall: $fn\n"; }'
+	echo "%.tsv: %.json"
+	/bin/echo -e "\\t\$(JCOMPILE_ROOT)/summarise-revapi-json-to-tsv.sh < \$< > \$@"
+	echo
+	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { my $bn = "$1__vs__$3.revapi.\$(MINSEVERITY)"; print "$bn.json:\n\t'"$REVAPI_BASE_CMD"'=\$(MINSEVERITY) --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=\$\@\nall: $bn.tsv\n"; }'
 else
 	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { print "'"$REVAPI_BASE_CMD=$MINSEVERITY"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=$1__vs__$3.revapi.'$MINSEVERITY'.json"; }'
 fi

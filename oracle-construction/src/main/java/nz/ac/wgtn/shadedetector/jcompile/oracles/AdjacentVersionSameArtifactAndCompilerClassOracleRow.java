@@ -6,8 +6,11 @@ import java.io.PrintStream;
 import java.util.stream.Stream;
 
 public class AdjacentVersionSameArtifactAndCompilerClassOracleRow extends ClassOracleRow {
-    public AdjacentVersionSameArtifactAndCompilerClassOracleRow(Pair<ZipPath, ZipPath> zPaths) {
+    private RevApiJarComparer.RevApiResult revApiResult;
+
+    public AdjacentVersionSameArtifactAndCompilerClassOracleRow(Pair<ZipPath, ZipPath> zPaths, RevApiJarComparer.RevApiResult revApiResult) {
         super(zPaths);
+        this.revApiResult = revApiResult;
     }
 
     @Override
@@ -38,7 +41,10 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracleRow extends ClassO
                         getLeft().scope(),
                         getRight().scope(),
                         getLeft().allInnerPaths().size() - 1,
-                        getRight().allInnerPaths().size() - 1)
+                        getRight().allInnerPaths().size() - 1,
+                        revApiResult.source() != RevApiJarComparer.Severity.BREAKING,
+                        revApiResult.binary() != RevApiJarComparer.Severity.BREAKING,
+                        revApiResult.semantic() != RevApiJarComparer.Severity.BREAKING)
                 .map(Utils::hyphenateEmpty).toList()));
     }
 }
