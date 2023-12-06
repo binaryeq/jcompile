@@ -44,9 +44,9 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracleRow extends ClassO
                         getRight().scope(),
                         getLeft().allInnerPaths().size() - 1,
                         getRight().allInnerPaths().size() - 1,
-                        toPrettyString(revApiResult.source()),
-                        toPrettyString(revApiResult.binary()),
-                        toPrettyString(revApiResult.semantic()))
+                        revApiResult.source() != RevApiJarComparer.Severity.BREAKING,
+                        revApiResult.binary() != RevApiJarComparer.Severity.BREAKING,
+                        revApiResult.semantic() != RevApiJarComparer.Severity.BREAKING)
                 .map(Utils::hyphenateEmpty).toList()));
     }
 }

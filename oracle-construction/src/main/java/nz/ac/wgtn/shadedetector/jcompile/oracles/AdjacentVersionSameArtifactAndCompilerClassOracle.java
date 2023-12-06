@@ -76,9 +76,9 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
                 "scope_2",
                 "n_anon_inner_classes_1",
                 "n_anon_inner_classes_2",
-                "source_compatibility",
-                "binary_compatibility",
-                "semantic_compatibility"
+                "source_compatible",
+                "binary_compatible",
+                "semantic_compatible"
         )));
         for (ClassOracleRow paths : oracle) {
             paths.printRow(System.out);
