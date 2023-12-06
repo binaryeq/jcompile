@@ -5,12 +5,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-public class PreprocessedJsonRevApiJarComparer extends RevApiJarComparer {
+/**
+ * An implementation of {@link RevApiJarComparer} that reads precomputed results in tab-separated format from files
+ * with names of the form {@code /path/to/<compiler>/<project>__vs__<project>.revapi.POTENTIALLY_BREAKING.tsv}.
+ */
+public class PreprocessedTsvRevApiJarComparer extends RevApiJarComparer {
     private static final RevApiResult EMPTY_RESULT = new RevApiResult(Severity.UNSPECIFIED, Severity.UNSPECIFIED, Severity.UNSPECIFIED);
     private List<Path> jars;        // Always contains 2 elements
     private Map<String, RevApiResult> revApiResults;
 
-    public PreprocessedJsonRevApiJarComparer(Path p1, Path p2) {
+    public PreprocessedTsvRevApiJarComparer(Path p1, Path p2) {
         this.jars = List.of(p1, p2);
         revApiResults = loadResultsFromTsv();
     }

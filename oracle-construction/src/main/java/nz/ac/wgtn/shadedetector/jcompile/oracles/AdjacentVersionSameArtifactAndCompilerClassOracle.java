@@ -42,7 +42,7 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
      * We need to run a revapi analysis on these two jars.
      */
     protected void processJarPair(Pair<Path, Path> jarPair) {
-        currentJarPairRevApiJarComparer = new PreprocessedJsonRevApiJarComparer(jarPair.getLeft(), jarPair.getRight());
+        currentJarPairRevApiJarComparer = new PreprocessedTsvRevApiJarComparer(jarPair.getLeft(), jarPair.getRight());
     }
 
     //    // for testing TODO: remove

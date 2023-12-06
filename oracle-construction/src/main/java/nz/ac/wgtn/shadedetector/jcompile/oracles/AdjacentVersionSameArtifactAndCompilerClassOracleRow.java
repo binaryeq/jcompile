@@ -5,8 +5,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.PrintStream;
 import java.util.stream.Stream;
 
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.RevApiJarComparer.Severity.toPrettyString;
-
 public class AdjacentVersionSameArtifactAndCompilerClassOracleRow extends ClassOracleRow {
     private RevApiJarComparer.RevApiResult revApiResult;
 
