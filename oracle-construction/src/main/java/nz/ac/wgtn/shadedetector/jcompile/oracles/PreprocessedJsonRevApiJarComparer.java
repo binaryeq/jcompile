@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class PreprocessedJsonRevApiJarComparer extends RevApiJarComparer {
+    private static final RevApiResult EMPTY_RESULT = new RevApiResult(Severity.UNSPECIFIED, Severity.UNSPECIFIED, Severity.UNSPECIFIED);
     private List<Path> jars;        // Always contains 2 elements
     private Map<String, RevApiResult> revApiResults;
 
@@ -15,7 +16,7 @@ public class PreprocessedJsonRevApiJarComparer extends RevApiJarComparer {
     }
 
     public RevApiResult compareClassVersions(Path innerPath) {
-        return revApiResults.get(innerPath.toString());
+        return revApiResults.getOrDefault(innerPath.toString(), EMPTY_RESULT);
     }
 
     private Path pathForJarPair() {
