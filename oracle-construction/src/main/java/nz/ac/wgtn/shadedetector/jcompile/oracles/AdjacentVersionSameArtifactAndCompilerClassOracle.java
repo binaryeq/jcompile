@@ -1,11 +1,13 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.tuple.Pair;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Construct a negative oracle for classes, i.e. sets of classes that originate from different but similar source code (adjacent versions),
@@ -13,6 +15,7 @@ import java.util.List;
  * @author jens dietrich
  */
 public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractClassOracle {
+    private RevApiJarComparer currentJarPairRevApiJarComparer;
 
     public AdjacentVersionSameArtifactAndCompilerClassOracle(boolean ignorePackageInfo, boolean ignoreAnonymousInnerClasses) {
         super(ignorePackageInfo, ignoreAnonymousInnerClasses);
@@ -26,11 +29,20 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
     public List<ClassOracleRow> build(Path jarFolder) throws IOException, URISyntaxException {
 
         List<Pair<Path,Path>> jarOracle = new AdjacentVersionSameArtifactAndCompilerJarOracle().build(jarFolder);
-        return buildFromJarPairs(jarOracle, AdjacentVersionSameArtifactAndCompilerClassOracle::makeRow);
+        return buildFromJarPairs(jarOracle, this::makeRow);
     }
 
-    private static AdjacentVersionSameArtifactAndCompilerClassOracleRow makeRow(Pair<ZipPath, ZipPath> zPaths) {
-        return new AdjacentVersionSameArtifactAndCompilerClassOracleRow(zPaths);
+    private AdjacentVersionSameArtifactAndCompilerClassOracleRow makeRow(Pair<ZipPath, ZipPath> zPaths) {
+        Preconditions.checkArgument(zPaths.getLeft().innerPath().equals(zPaths.getRight().innerPath()));
+        return new AdjacentVersionSameArtifactAndCompilerClassOracleRow(zPaths, currentJarPairRevApiJarComparer.compareClassVersions(zPaths.getLeft().innerPath()));
+    }
+
+    /**
+     * Called from inside {@link #buildFromJarPairs(List, Function)} whenever a new jar pair is being considered.
+     * We need to run a revapi analysis on these two jars.
+     */
+    protected void processJarPair(Pair<Path, Path> jarPair) {
+        currentJarPairRevApiJarComparer = new PreprocessedJsonRevApiJarComparer(jarPair.getLeft(), jarPair.getRight());
     }
 
     //    // for testing TODO: remove
@@ -63,7 +75,10 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
                 "scope_1",
                 "scope_2",
                 "n_anon_inner_classes_1",
-                "n_anon_inner_classes_2"
+                "n_anon_inner_classes_2",
+                "source_compatibility",
+                "binary_compatibility",
+                "semantic_compatibility"
         )));
         for (ClassOracleRow paths : oracle) {
             paths.printRow(System.out);
