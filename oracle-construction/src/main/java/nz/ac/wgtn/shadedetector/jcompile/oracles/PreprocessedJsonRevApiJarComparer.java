@@ -30,7 +30,7 @@ public class PreprocessedJsonRevApiJarComparer extends RevApiJarComparer {
         try {
             for (String line : Files.readAllLines(tsvPath)) {
                 String[] fields = line.split("\t");
-                String classPath = fields[0].replaceAll("\\.", "/") + ".class";
+                String classPath = "/" + fields[0].replaceAll("\\.", "/") + ".class";
                 RevApiResult revApiResult = new RevApiResult(Severity.fromString(fields[1]), Severity.fromString(fields[2]), Severity.fromString(fields[3]));
                 map.compute(classPath, (k, v) -> (v == null) ? revApiResult : combineRevApiResults(v, revApiResult));
             }
