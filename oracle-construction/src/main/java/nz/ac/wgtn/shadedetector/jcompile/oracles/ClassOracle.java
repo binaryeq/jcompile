@@ -11,5 +11,5 @@ import java.util.List;
  * @author jens dietrich
  */
 public interface ClassOracle {
-    List<Pair<ZipPath,ZipPath>> build (Path jarFolder) throws IOException, URISyntaxException;
+    List<ClassOracleRow> build (Path jarFolder) throws IOException, URISyntaxException;
 }

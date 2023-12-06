@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Construct a positive oracle for classes, i.e. sets of classes that originate from the same source code,
@@ -25,16 +24,20 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
     }
 
     @Override
-    public List<Pair<ZipPath, ZipPath>> build(Path jarFolder) throws IOException, URISyntaxException {
+    public List<ClassOracleRow> build(Path jarFolder) throws IOException, URISyntaxException {
 
         List<Pair<Path,Path>> jarOracle = new SameArtifactDifferentCompilerJarOracle().build(jarFolder);
-        return buildFromJarPairs(jarOracle);
+        return buildFromJarPairs(jarOracle, SameArtifactDifferentCompilerClassOracle::makeRow);
+    }
+
+    private static SameArtifactDifferentCompilerClassOracleRow makeRow(Pair<ZipPath, ZipPath> zPaths) {
+        return new SameArtifactDifferentCompilerClassOracleRow(zPaths);
     }
 
     //    // for testing TODO: remove
     public static void main (String[] args) throws IOException, URISyntaxException {
         Path jarFolder = Path.of(args[0]);
-        List<Pair<ZipPath, ZipPath>> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);
+        List<ClassOracleRow> oracle = new SameArtifactDifferentCompilerClassOracle().build(jarFolder);     //TODO: Use more specific type
         System.out.println(String.join("\t", Arrays.asList(
                 "container_1",
                 "container_2",
@@ -65,37 +68,8 @@ public class SameArtifactDifferentCompilerClassOracle extends AbstractClassOracl
                 "n_anon_inner_classes_1",
                 "n_anon_inner_classes_2"
         )));
-        for (Pair<ZipPath, ZipPath> paths : oracle) {
-            System.out.println(String.join("\t", Stream.of(
-                        paths.getLeft().outerPath(),
-                        paths.getRight().outerPath(),
-                        paths.getLeft().innerPath(),
-                        paths.getRight().innerPath(),
-                        paths.getLeft().compilerName(),
-                        paths.getRight().compilerName(),
-                        paths.getLeft().compilerMajorVersion(),
-                        paths.getRight().compilerMajorVersion(),
-                        paths.getLeft().compilerMinorVersion(),
-                        paths.getRight().compilerMinorVersion(),
-                        paths.getLeft().compilerPatchVersion(),
-                        paths.getRight().compilerPatchVersion(),
-                        paths.getLeft().compilerExtraConfiguration(),
-                        paths.getRight().compilerExtraConfiguration(),
-                        paths.getLeft().projectName(),
-                        paths.getLeft().projectMajorVersion(),
-                        paths.getLeft().projectMinorVersion(),
-                        paths.getLeft().projectPatchVersion(),
-                        paths.getLeft().generatedBy(),
-                        paths.getRight().generatedBy(),
-                        paths.getLeft().bytecodeFeatures().contains("JEP181"),
-                        paths.getRight().bytecodeFeatures().contains("JEP181"),
-                        paths.getLeft().bytecodeFeatures().contains("JEP280"),
-                        paths.getRight().bytecodeFeatures().contains("JEP280"),
-                        paths.getLeft().scope(),
-                        paths.getRight().scope(),
-                        paths.getLeft().allInnerPaths().size() - 1,
-                        paths.getRight().allInnerPaths().size() - 1)
-                    .map(Utils::hyphenateEmpty).toList()));
+        for (ClassOracleRow paths : oracle) {
+            paths.printRow(System.out);
         }
     }
 
