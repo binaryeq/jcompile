@@ -71,11 +71,8 @@ public class SameArtifactDifferentCompilerJarOracle implements JarOracle {
         Path jarFolder = Path.of(args[0]);
         List<Pair<Path, Path>> oracle = new SameArtifactDifferentCompilerJarOracle().build(jarFolder) ;
         for (Pair<Path, Path> pair:oracle) {
-            System.out.println(pair.getLeft().toFile());
-            System.out.println(pair.getRight().toFile());
-            System.out.println();
+            System.out.println(pair.getLeft().toFile() + "\t" + pair.getRight().toFile());
         }
-        System.out.println("oracle size: " + oracle.size());
 
     }
 
