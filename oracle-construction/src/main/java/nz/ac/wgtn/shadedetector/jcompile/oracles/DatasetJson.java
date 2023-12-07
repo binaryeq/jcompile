@@ -40,7 +40,6 @@ public class DatasetJson {
         for (JsonElement project : array.asList()) {
             String projectName = project.getAsJsonObject().getAsJsonPrimitive("name").getAsString();
             String jarName = project.getAsJsonObject().getAsJsonPrimitive("jar").getAsString();
-            System.err.println("Read jar " + jarName + " -> " + projectName + " from dataset.json");        //DEBUG
             result.put(jarName, projectName);
         }
 
@@ -52,7 +51,6 @@ public class DatasetJson {
         try {
             String path = "dataset.json";
             for (int i = 0; i < 5; ++i) {
-                System.err.println("Looking for dataset.json at " + path);        //DEBUG
                 if (Files.exists(Path.of(path))) {
                     System.err.println("Found dataset.json at " + path);        //DEBUG
                     return Files.readString(Path.of(path));
