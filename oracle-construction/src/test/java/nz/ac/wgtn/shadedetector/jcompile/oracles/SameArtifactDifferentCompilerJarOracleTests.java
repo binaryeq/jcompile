@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.JARS;
-import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.pair;
+
+import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,6 +18,7 @@ public class SameArtifactDifferentCompilerJarOracleTests {
 
     @BeforeAll
     public static void buildOracle () throws IOException {
+        setupDatasetJsonForTesting();
         oracle = new SameArtifactDifferentCompilerJarOracle().build(JARS);
     }
 

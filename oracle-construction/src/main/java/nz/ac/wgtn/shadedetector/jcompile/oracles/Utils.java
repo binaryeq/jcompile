@@ -22,9 +22,14 @@ import java.util.stream.Collectors;
 public class Utils {
 
     public static final Function<Path,String> COMPILER_USED = p -> p.getParent().getFileName().toString();
+
+    /**
+     * Does a full lookup based on metadata in dataset.json, since the project name may be unrelated to the filename.
+     * The jar name must match exactly a jar name there, except that it can optionally contain "-tests" before ".jar".
+     */
     public static final Function<Path,String> COMPONENT_NAME = p -> {
         String fileName = p.getFileName().toString();
-        return fileName.replaceFirst("-[^-]+(?:-tests)?\\.jar$", "");       // Ignore "-tests"
+        return DatasetJson.getProjectNameForJarName(fileName.replaceFirst("-tests\\.jar$", ".jar"));       // Ignore "-tests"
     };
     public static final Function<Path,String> ARTIFACT = p -> p.getFileName().toString();
     public static final Function<Path,String> JAR_TYPE = p -> p.getFileName().toString().matches(".*-tests\\.jar") ? "-tests" : "";    // Strict check to minimally restrict version syntax

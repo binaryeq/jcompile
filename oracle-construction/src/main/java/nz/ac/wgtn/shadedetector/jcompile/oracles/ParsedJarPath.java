@@ -46,9 +46,11 @@ public record ParsedJarPath (
             @NonNull String jarType     // Either the empty string or "-tests", never null
     ) {
         public static @Nullable Project parse(Path jarPath) {
-            Matcher m = Pattern.compile("([^.]+)-([^-.]+)(?:\\.([^-.]+))?(?:\\.([^-.]+))?(|-tests)\\.jar").matcher(jarPath.getFileName().toString());
+            Matcher m = Pattern.compile("(([^.]+)-([^-.]+)(?:\\.([^-.]+))?(?:\\.([^-.]+))?)(|-tests)\\.jar").matcher(jarPath.getFileName().toString());
             if (m.matches()) {
-                return new Project(m.group(1), m.group(2), m.group(3), m.group(4), m.group(5));
+                // Actually does a full lookup of the project name from dataset.json, since in general it can't be
+                // reliably inferred just from the filename. We don't use what is no m.group(2).
+                return new Project(DatasetJson.getProjectNameForJarName(m.group(1) + ".jar"), m.group(3), m.group(4), m.group(5), m.group(6));
             }
 
             return null;

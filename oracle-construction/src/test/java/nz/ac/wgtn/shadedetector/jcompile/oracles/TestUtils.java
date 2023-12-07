@@ -9,6 +9,16 @@ public class TestUtils {
 
     public static Path JARS = Path.of(TestUtils.class.getResource("/jars").getFile());
 
+    public static Path DATASET_JSON = Path.of(TestUtils.class.getResource("/dataset-for-tests.json").getFile());
+
+    /**
+     * Every test suite that indirectly winds up running {@link DatasetJson} code needs to call this in a {@code @BeforeAll},
+     * Yes, it's horrible. But threading parameters everywhere would be too.
+     */
+    static void setupDatasetJsonForTesting() {
+        DatasetJson.datasetJsonPath = DATASET_JSON.toString();
+    }
+
     static Pair<Path,Path> pair(String path1, String path2) {
         Assertions.assertTrue(!path1.equals(path2));
         Path f1 = JARS.resolve(path1);

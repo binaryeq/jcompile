@@ -1,12 +1,19 @@
 package nz.ac.wgtn.shadedetector.jcompile.oracles;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
+import static nz.ac.wgtn.shadedetector.jcompile.oracles.TestUtils.DATASET_JSON;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParsedJarPathTest {
+    @BeforeAll
+    public static void configureDatasetJsonPath() {
+        TestUtils.setupDatasetJsonForTesting();
+    }
+
     @Test
     public void testParsedJarPath_parseRegularPath() {
         Path p = Path.of("/foo/bar/openjdk-1.2.3/some-project-4.5.6.jar");

@@ -42,11 +42,8 @@ public class AdjacentVersionSameArtifactAndCompilerJarOracle implements JarOracl
         Path jarFolder = Path.of(args[0]);
         List<Pair<Path, Path>> oracle = new AdjacentVersionSameArtifactAndCompilerJarOracle().build(jarFolder) ;
         for (Pair<Path, Path> pair:oracle) {
-            System.out.println(pair.getLeft().toFile());
-            System.out.println(pair.getRight().toFile());
-            System.out.println();
+            System.out.println(pair.getLeft().toFile() + "\t" + pair.getRight().toFile());
         }
-        System.out.println("oracle size: " + oracle.size());
 
     }
 
