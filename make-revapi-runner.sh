@@ -26,7 +26,7 @@ then
 	echo "%.tsv: %.json"
 	/bin/echo -e "\\t\$(JCOMPILE_ROOT)/summarise-revapi-json-to-tsv.sh < \$< > \$@"
 	echo
-	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { my $bn = "$1__vs__$3.revapi.\$(MINSEVERITY)"; print "$bn.json:\n\t'"$REVAPI_BASE_CMD"'=\$(MINSEVERITY) --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=\$\@\nall: $bn.tsv\n"; }'
+	perl -lne 'if (m%^(?:analysing: )?(\S+)\.jar(?: vs |\t)(\S+/([^/]+))\.jar%) { my $bn = "$1__vs__$3.revapi.\$(MINSEVERITY)"; print "$bn.json:\n\t'"$REVAPI_BASE_CMD"'=\$(MINSEVERITY) --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=\$\@\nall: $bn.tsv\n"; }'
 else
-	perl -lne 'if (m|^analysing: (\S+)\.jar vs (\S+/([^/]+))\.jar|) { print "'"$REVAPI_BASE_CMD=$MINSEVERITY"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=$1__vs__$3.revapi.'$MINSEVERITY'.json"; }'
+	perl -lne 'if (m%^(?:analysing: )?(\S+)\.jar(?: vs |\t)(\S+/([^/]+))\.jar%) { print "'"$REVAPI_BASE_CMD=$MINSEVERITY"' --old=$1.jar --new=$2.jar -Drevapi.reporter.json.output=$1__vs__$3.revapi.'$MINSEVERITY'.json"; }'
 fi
