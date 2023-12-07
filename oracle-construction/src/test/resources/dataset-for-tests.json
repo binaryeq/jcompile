@@ -1,0 +1,27 @@
+[
+  {
+    "name":"commons-io",
+    "tag":"rel/commons-io-2.7",
+    "jar":"commons-io-2.7.jar"
+  },
+  {
+    "name": "commons-io",
+    "tag": "rel/commons-io-2.8.0",
+    "jar": "commons-io-2.8.0.jar"
+  },
+  {
+    "name":"commons-codec",
+    "tag":"commons-codec-1.11",
+    "jar":"commons-codec-1.11.jar"
+  },
+  {
+    "name":"commons-codec",
+    "tag":"commons-codec-1.12",
+    "jar":"commons-codec-1.12.jar"
+  },
+  {
+    "name": "some-project",
+    "tag": "rel/commons-io-2.8.0",
+    "jar": "some-project-4.5.6.jar"
+  }
+]

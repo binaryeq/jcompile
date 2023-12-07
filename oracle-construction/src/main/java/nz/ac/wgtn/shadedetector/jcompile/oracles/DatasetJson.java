@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -20,6 +21,9 @@ import com.google.gson.JsonParser;
  */
 public class DatasetJson {
     private static Map<String, String> dataset;
+
+    @VisibleForTesting
+    public static String datasetJsonPath = "dataset.json";
 
     public static String getProjectNameForJarName(String jarName) {
         return getDataset().get(jarName);
@@ -49,14 +53,13 @@ public class DatasetJson {
     // Just tries a few parent directories...
     private static String getDatasetJsonFileAsString() {
         try {
-            String path = "dataset.json";
             for (int i = 0; i < 5; ++i) {
-                if (Files.exists(Path.of(path))) {
-                    System.err.println("Found dataset.json at " + path);        //DEBUG
-                    return Files.readString(Path.of(path));
+                if (Files.exists(Path.of(datasetJsonPath))) {
+                    System.err.println("Found dataset.json at " + datasetJsonPath);        //DEBUG
+                    return Files.readString(Path.of(datasetJsonPath));
                 }
 
-                path = "../" + path;
+                datasetJsonPath = "../" + datasetJsonPath;
             }
 
             throw new RuntimeException("Could not find dataset.json!");
