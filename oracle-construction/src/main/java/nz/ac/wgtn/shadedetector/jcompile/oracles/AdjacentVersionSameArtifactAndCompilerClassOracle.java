@@ -34,7 +34,16 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracle extends AbstractC
 
     private AdjacentVersionSameArtifactAndCompilerClassOracleRow makeRow(Pair<ZipPath, ZipPath> zPaths) {
         Preconditions.checkArgument(zPaths.getLeft().innerPath().equals(zPaths.getRight().innerPath()));
-        return new AdjacentVersionSameArtifactAndCompilerClassOracleRow(zPaths, currentJarPairRevApiJarComparer.compareClassVersions(zPaths.getLeft().innerPath()));
+
+        AdjacentVersionSameArtifactAndCompilerClassOracleRow row = new AdjacentVersionSameArtifactAndCompilerClassOracleRow(zPaths, currentJarPairRevApiJarComparer.compareClassVersions(zPaths.getLeft().innerPath()));
+        RevApiJarComparer.RevApiResult revApiResult = row.getRevApiResult();
+        if (revApiResult.source() == RevApiJarComparer.Severity.BREAKING || revApiResult.binary() == RevApiJarComparer.Severity.BREAKING || revApiResult.semantic() == RevApiJarComparer.Severity.BREAKING) {
+            // RevApi thinks these classes are incompatible: Keep this row
+            return row;
+        } else {
+            // RevApi thinks these classes are compatible: Drop this row
+            return null;
+        }
     }
 
     /**

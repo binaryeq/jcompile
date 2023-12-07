@@ -86,7 +86,10 @@ public abstract class AbstractClassOracle implements ClassOracle {
                         .map(i -> groupAnonInnerClasses(classes.get(i).get(commonNamedClass), jars.get(i), parsedJarPaths.get(i).compiler(), parsedJarPaths.get(i).project(), jarMetadatas.get(i), scope))
                         .toList();
                 if (includeClassPair(zPaths.get(0), zPaths.get(1))) {
-                    classOracle.add(makeRow.apply(Pair.of(zPaths.get(0), zPaths.get(1))));
+                    R maybeRow = makeRow.apply(Pair.of(zPaths.get(0), zPaths.get(1)));  // makeRow() may still decide it doesn't want this row
+                    if (maybeRow != null) {
+                        classOracle.add(maybeRow);
+                    }
                 }
             }
         }

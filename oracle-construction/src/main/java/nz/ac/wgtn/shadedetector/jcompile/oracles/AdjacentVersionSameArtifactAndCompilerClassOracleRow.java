@@ -13,6 +13,10 @@ public class AdjacentVersionSameArtifactAndCompilerClassOracleRow extends ClassO
         this.revApiResult = revApiResult;
     }
 
+    public RevApiJarComparer.RevApiResult getRevApiResult() {
+        return revApiResult;
+    }
+
     @Override
     public void printRow(PrintStream out) {
         out.println(String.join("\t", Stream.of(
