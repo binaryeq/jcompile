@@ -103,5 +103,9 @@
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.32.0_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.13.0"
+	},
+	{
+		"image":"container-registry.oracle.com/java/jdk:11.0.19-ol8-amd64",
+		"name":"oraclejdk-11.0.19"
 	}
 ]
