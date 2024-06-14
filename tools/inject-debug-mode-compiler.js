@@ -45,6 +45,21 @@ function transform(pomJson, ancestors) {
 	}
 }
 
+function findOrMakeElement(root, elemName) {
+	if (!('elements' in root)) {
+		root.elements = [];
+	}
+
+	let existingElem = root.elements.find((e) => e.type === 'element' && e.name === elemName);
+	if (existingElem) {
+		return existingElem;
+	} else {
+		const elem = { type: 'element', name: elemName };
+		root.elements.push({ type: 'element', name: elemName });
+		return elem;
+	}
+}
+
 function inject() {
 	console.warn(`Will inject ${existingPluginsListsWithoutCompilerPlugin.length} maven-compiler-plugin plugins into existing <plugins> elements that don't have them yet:`);
 	for (const e of existingPluginsListsWithoutCompilerPlugin) {
@@ -88,5 +103,15 @@ function inject() {
 				]
 			}
 		] });
+	}
+
+	console.warn(`Will modify ${existingCompilerPlugins.length} maven-compiler-plugin <plugin> elements by adding '-g' arguments:`);
+	for (const e of existingCompilerPlugins) {
+		const configuration = findOrMakeElement(e, 'configuration');
+		const compilerArgs = findOrMakeElement(e, 'compilerArgs');
+		if (!('elements' in compilerArgs)) {
+			compilerArgs.elements = [];
+		}
+		compilerArgs.elements.push({ type: 'element', name: 'arg', elements: [{ type: 'text', text: '-g' }] });
 	}
 }
