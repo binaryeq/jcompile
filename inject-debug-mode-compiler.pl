@@ -9,7 +9,6 @@
 use strict;
 use warnings;
 
-my $v = shift;
 my $inBuild = 0;
 my $success = 0;
 
