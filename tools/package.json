@@ -1,0 +1,15 @@
+{
+  "name": "inject-debug-mode-compiler",
+  "version": "1.0.0",
+  "description": "Used internally by docker-build-project.sh",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Tim White",
+  "license": "ISC",
+  "dependencies": {
+    "xml-js": "^1.6.11"
+  }
+}
