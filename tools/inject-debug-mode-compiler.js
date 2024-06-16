@@ -24,7 +24,7 @@ function transform(pomJson, ancestors) {
 	if (pomJson.type === 'element' && pomJson.name === 'artifactId' && ancestors.slice(0, 3).every((e) => e.type === 'element') && ancestors.slice(0, 3).map((e) => e.name).join('>') === 'plugin>plugins>build') {
 		if (pomJson?.elements?.[0]?.text === 'maven-compiler-plugin') {
 			console.warn(`Found existing maven-compiler-plugin element!`);
-			existingCompilerPlugins.push(pomJson);
+			existingCompilerPlugins.push(ancestors[0]);
 			const iParentPluginsList = existingPluginsListsWithoutCompilerPlugin.indexOf(ancestors[1]);
 			if (iParentPluginsList !== -1) {
 				console.warn(`Removing its parent from the list of <plugins> elements without a compiler plugin.`);
@@ -46,14 +46,18 @@ function transform(pomJson, ancestors) {
 }
 
 function findOrMakeElement(root, elemName) {
+	console.warn(`findOrMakeElement(root=`, root, `, elemName=${elemName}) called.`);		//DEBUG
 	if (!('elements' in root)) {
+		console.warn(`findOrMakeElement(): Adding nonexistent 'elements' array`);		//DEBUG
 		root.elements = [];
 	}
 
 	let existingElem = root.elements.find((e) => e.type === 'element' && e.name === elemName);
 	if (existingElem) {
+		console.warn(`findOrMakeElement(): Found existing '${elemName}', returning it.`);		//DEBUG
 		return existingElem;
 	} else {
+		console.warn(`findOrMakeElement(): Did not find any existing '${elemName}', adding a new one.`);		//DEBUG
 		const elem = { type: 'element', name: elemName };
 		root.elements.push({ type: 'element', name: elemName });
 		return elem;
@@ -108,7 +112,7 @@ function inject() {
 	console.warn(`Will modify ${existingCompilerPlugins.length} maven-compiler-plugin <plugin> elements by adding '-g' arguments:`);
 	for (const e of existingCompilerPlugins) {
 		const configuration = findOrMakeElement(e, 'configuration');
-		const compilerArgs = findOrMakeElement(e, 'compilerArgs');
+		const compilerArgs = findOrMakeElement(configuration, 'compilerArgs');
 		if (!('elements' in compilerArgs)) {
 			compilerArgs.elements = [];
 		}
