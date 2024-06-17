@@ -5,23 +5,18 @@ const fs = require("fs");
 const existingPluginsListsWithoutCompilerPlugin = [];
 const existingCompilerPlugins = [];
 
-console.warn("Starting.");
+console.warn(`${process.argv[1]} starting.`);
 const stdinBuffer = fs.readFileSync(0); // STDIN_FILENO = 0
 const stdin = stdinBuffer.toString();
 
 let pomJson = convert.xml2js(stdin, { compact: false, spaces: 2 });
-//const newPomJson = transform(pomJson, []);
-console.warn(`BEFORE: pomJson=`, pomJson);
 transform(pomJson, []);
 inject();
-console.warn(`AFTER: pomJson=`, pomJson);
-const newPomJson = pomJson;		//HACK
-let newPomXml = convert.js2xml(newPomJson, { compact: false, spaces: 2 });
+let newPomXml = convert.js2xml(pomJson, { compact: false, spaces: 2 });
 console.log(newPomXml);
-console.warn("Finished.");
+console.warn(`${process.argv[1]} finished.`);
 
 function transform(pomJson, ancestors) {
-	//console.warn(`transform(pomJson=`, pomJson, `, ancestors=[${ancestors.map((e) => e.name).join(', ')}]) called.`);		//DEBUG
 	if (pomJson.type === 'element' && pomJson.name === 'artifactId' && ancestors.slice(0, 3).every((e) => e.type === 'element') && ancestors.slice(0, 3).map((e) => e.name).join('>') === 'plugin>plugins>build') {
 		if (pomJson?.elements?.[0]?.text === 'maven-compiler-plugin') {
 			console.warn(`Found existing maven-compiler-plugin element!`);
@@ -51,18 +46,14 @@ function comment() {
 }
 
 function findOrMakeElement(root, elemName, commentHolder) {
-	console.warn(`findOrMakeElement(root=`, root, `, elemName=${elemName}) called.`);		//DEBUG
 	if (!('elements' in root)) {
-		console.warn(`findOrMakeElement(): Adding nonexistent 'elements' array`);		//DEBUG
 		root.elements = [];
 	}
 
 	let existingElem = root.elements.find((e) => e.type === 'element' && e.name === elemName);
 	if (existingElem) {
-		console.warn(`findOrMakeElement(): Found existing '${elemName}', returning it.`);		//DEBUG
 		return existingElem;
 	} else {
-		console.warn(`findOrMakeElement(): Did not find any existing '${elemName}', adding a new one.`);		//DEBUG
 		if (!commentHolder.commented) {
 			root.elements.push(comment());
 			commentHolder.commented = true;
@@ -136,19 +127,16 @@ function inject() {
 	console.warn(`Will modify ${existingCompilerPlugins.length} maven-compiler-plugin <plugin> elements by adding '-g' arguments:`);
 
 	function addHyphenG(e) {
-		console.warn(`addHyphen(e=`, e, `) called.`);
 		const commentHolder = { commented: false };		// Will be set true by the call to findOrMakeElement() that needs to add an element
 		const configuration = findOrMakeElement(e, 'configuration', commentHolder);
 		const compilerArgs = findOrMakeElement(configuration, 'compilerArgs', commentHolder);
 		if (!('elements' in compilerArgs)) {
-			console.warn(`addHyphen(): Adding missing elements array.`);
 			compilerArgs.elements = [];
 		}
 		if (!commentHolder.commented) {
 			compilerArgs.elements.push(comment());
 		}
 		compilerArgs.elements.push({ type: 'element', name: 'arg', elements: [{ type: 'text', text: '-g' }] });
-		console.warn(`addHyphen() about to return: `, compilerArgs);
 	}
 
 	for (const e of existingCompilerPlugins) {
