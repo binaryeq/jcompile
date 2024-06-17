@@ -5,15 +5,24 @@ const fs = require("fs");
 const existingPluginsListsWithoutCompilerPlugin = [];
 const existingCompilerPlugins = [];
 
-console.warn(`${process.argv[1]} starting.`);
-const stdinBuffer = fs.readFileSync(0); // STDIN_FILENO = 0
+let inFName = process.argv[2];
+if (fs.lstatSync(inFName).isDirectory()) {
+	inFName += '/pom.xml';
+}
+
+const renamedInFName = inFName + ".bak";
+console.warn(`${process.argv[1]} starting. Will process ${inFName}, renaming the original to ${renamedInFName}.bak.`);
+fs.renameSync(inFName, renamedInFName);	// Let exception terminate us if a problem occurs
+
+//const stdinBuffer = fs.readFileSync(0); // STDIN_FILENO = 0
+const stdinBuffer = fs.readFileSync(renamedInFName);
 const stdin = stdinBuffer.toString();
 
 let pomJson = convert.xml2js(stdin, { compact: false, spaces: 2 });
 transform(pomJson, []);
 inject();
 let newPomXml = convert.js2xml(pomJson, { compact: false, spaces: 2 });
-console.log(newPomXml);
+fs.writeFileSync(inFName, newPomXml);
 console.warn(`${process.argv[1]} finished.`);
 
 function transform(pomJson, ancestors) {
