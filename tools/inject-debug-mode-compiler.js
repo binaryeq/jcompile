@@ -1,3 +1,4 @@
+const process = require('process');
 const convert = require('xml-js');
 const fs = require("fs");
 
@@ -45,7 +46,11 @@ function transform(pomJson, ancestors) {
 	}
 }
 
-function findOrMakeElement(root, elemName) {
+function comment() {
+	return { type: 'comment', comment: `Inserted automatically by ${process.argv[1]}` };
+}
+
+function findOrMakeElement(root, elemName, commentHolder) {
 	console.warn(`findOrMakeElement(root=`, root, `, elemName=${elemName}) called.`);		//DEBUG
 	if (!('elements' in root)) {
 		console.warn(`findOrMakeElement(): Adding nonexistent 'elements' array`);		//DEBUG
@@ -58,6 +63,10 @@ function findOrMakeElement(root, elemName) {
 		return existingElem;
 	} else {
 		console.warn(`findOrMakeElement(): Did not find any existing '${elemName}', adding a new one.`);		//DEBUG
+		if (!commentHolder.commented) {
+			root.elements.push(comment());
+			commentHolder.commented = true;
+		}
 		const elem = { type: 'element', name: elemName };
 		root.elements.push(elem);
 		return elem;
@@ -82,7 +91,7 @@ function forEachElement(root, elemNames, cb) {
 function inject() {
 	console.warn(`Will inject ${existingPluginsListsWithoutCompilerPlugin.length} maven-compiler-plugin plugins into existing <plugins> elements that don't have them yet:`);
 	for (const e of existingPluginsListsWithoutCompilerPlugin) {
-		e.elements.push({ type: 'element', name: 'plugin', elements: [
+		e.elements.push(comment(), { type: 'element', name: 'plugin', elements: [
 			{
 				type: 'element',
 				name: 'plugin',
@@ -128,11 +137,15 @@ function inject() {
 
 	function addHyphenG(e) {
 		console.warn(`addHyphen(e=`, e, `) called.`);
-		const configuration = findOrMakeElement(e, 'configuration');
-		const compilerArgs = findOrMakeElement(configuration, 'compilerArgs');
+		const commentHolder = { commented: false };		// Will be set true by the call to findOrMakeElement() that needs to add an element
+		const configuration = findOrMakeElement(e, 'configuration', commentHolder);
+		const compilerArgs = findOrMakeElement(configuration, 'compilerArgs', commentHolder);
 		if (!('elements' in compilerArgs)) {
 			console.warn(`addHyphen(): Adding missing elements array.`);
 			compilerArgs.elements = [];
+		}
+		if (!commentHolder.commented) {
+			compilerArgs.elements.push(comment());
 		}
 		compilerArgs.elements.push({ type: 'element', name: 'arg', elements: [{ type: 'text', text: '-g' }] });
 		console.warn(`addHyphen() about to return: `, compilerArgs);
