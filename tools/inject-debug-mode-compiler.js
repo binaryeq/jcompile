@@ -1,4 +1,5 @@
 const process = require('process');
+const child_process = require('child_process');
 const convert = require('xml-js');
 const fs = require("fs");
 
@@ -23,6 +24,9 @@ transform(pomJson, []);
 inject();
 let newPomXml = convert.js2xml(pomJson, { compact: false, spaces: 2 });
 fs.writeFileSync(inFName, newPomXml);
+const dir = inFName.indexOf('/')  == -1 ? '.' : inFName.replace(/\/[^/]*$/, '');
+console.warn(`${process.argv[1]} running 'mvn tidy:pom' in dir ${dir}...`);
+child_process.execSync('mvn tidy:pom', { cwd: dir, stdio: 'inherit' });		// Otherwise the pom.xml formatting may be 'wrong', which some projects will complain about
 console.warn(`${process.argv[1]} finished.`);
 
 function transform(pomJson, ancestors) {
