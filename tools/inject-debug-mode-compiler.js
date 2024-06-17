@@ -91,46 +91,44 @@ function forEachElement(root, elemNames, cb) {
 function inject() {
 	console.warn(`Will inject ${existingPluginsListsWithoutCompilerPlugin.length} maven-compiler-plugin plugins into existing <plugins> elements that don't have them yet:`);
 	for (const e of existingPluginsListsWithoutCompilerPlugin) {
-		e.elements.push(comment(), { type: 'element', name: 'plugin', elements: [
-			{
-				type: 'element',
-				name: 'plugin',
-				elements: [
-					{
-						type: 'element',
-						name: 'artifactId',
-						elements: [
-							{
-								type: 'text',
-								text: 'maven-compiler-plugin'
-							}
-						]
-					},
-					{
-						type: 'element',
-						name: 'configuration',
-						elements: [
-							{
-								type: 'element',
-								name: 'compilerArgs',
-								elements: [
-									{
-										type: 'element',
-										name: 'arg',
-										elements: [
-											{
-												type: 'text',
-												text: '-g'
-											}
-										]
-									}
-								]
-							}
-						]
-					}
-				]
-			}
-		] });
+		e.elements.push(comment(), {
+			type: 'element',
+			name: 'plugin',
+			elements: [
+				{
+					type: 'element',
+					name: 'artifactId',
+					elements: [
+						{
+							type: 'text',
+							text: 'maven-compiler-plugin'
+						}
+					]
+				},
+				{
+					type: 'element',
+					name: 'configuration',
+					elements: [
+						{
+							type: 'element',
+							name: 'compilerArgs',
+							elements: [
+								{
+									type: 'element',
+									name: 'arg',
+									elements: [
+										{
+											type: 'text',
+											text: '-g'
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		});
 	}
 
 	console.warn(`Will modify ${existingCompilerPlugins.length} maven-compiler-plugin <plugin> elements by adding '-g' arguments:`);
