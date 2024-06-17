@@ -59,8 +59,23 @@ function findOrMakeElement(root, elemName) {
 	} else {
 		console.warn(`findOrMakeElement(): Did not find any existing '${elemName}', adding a new one.`);		//DEBUG
 		const elem = { type: 'element', name: elemName };
-		root.elements.push({ type: 'element', name: elemName });
+		root.elements.push(elem);
 		return elem;
+	}
+}
+
+function forEachElement(root, elemNames, cb) {
+	if (!('elements' in root)) {
+		return;
+	}
+
+	if (!elemNames.length) {
+		cb(root);
+	}
+
+	const elemName = elemNames.shift();
+	for (const next of root.elements.filter((e) => e.type === 'element' && e.name === elemName)) {
+		forEachElement(next, elemNames, cb);
 	}
 }
 
@@ -110,12 +125,25 @@ function inject() {
 	}
 
 	console.warn(`Will modify ${existingCompilerPlugins.length} maven-compiler-plugin <plugin> elements by adding '-g' arguments:`);
-	for (const e of existingCompilerPlugins) {
+
+	function addHyphenG(e) {
+		console.warn(`addHyphen(e=`, e, `) called.`);
 		const configuration = findOrMakeElement(e, 'configuration');
 		const compilerArgs = findOrMakeElement(configuration, 'compilerArgs');
 		if (!('elements' in compilerArgs)) {
+			console.warn(`addHyphen(): Adding missing elements array.`);
 			compilerArgs.elements = [];
 		}
 		compilerArgs.elements.push({ type: 'element', name: 'arg', elements: [{ type: 'text', text: '-g' }] });
+		console.warn(`addHyphen() about to return: `, compilerArgs);
+	}
+
+	for (const e of existingCompilerPlugins) {
+		addHyphenG(e);
+
+		// Also need to check for <configuration>s within <executions><execution>...</execution></executions>
+		forEachElement(e, ['executions', 'execution'], (e2) => {
+			addHyphenG(e2);
+		});
 	}
 }
