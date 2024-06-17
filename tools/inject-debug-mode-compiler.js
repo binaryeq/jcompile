@@ -88,53 +88,34 @@ function forEachElement(root, elemNames, cb) {
 	}
 }
 
+function makeElem(name, ...elements) {
+	return { type: 'element', name, elements };
+}
+
+function makeText(text) {
+	return { type: 'text', text };
+}
+
 function inject() {
 	console.warn(`Will inject ${existingPluginsListsWithoutCompilerPlugin.length} maven-compiler-plugin plugins into existing <plugins> elements that don't have them yet:`);
 	for (const e of existingPluginsListsWithoutCompilerPlugin) {
-		e.elements.push(comment(), {
-			type: 'element',
-			name: 'plugin',
-			elements: [
-				{
-					type: 'element',
-					name: 'artifactId',
-					elements: [
-						{
-							type: 'text',
-							text: 'maven-compiler-plugin'
-						}
-					]
-				},
-				{
-					type: 'element',
-					name: 'configuration',
-					elements: [
-						{
-							type: 'element',
-							name: 'compilerArgs',
-							elements: [
-								{
-									type: 'element',
-									name: 'arg',
-									elements: [
-										{
-											type: 'text',
-											text: '-g'
-										}
-									]
-								}
-							]
-						}
-					]
-				}
-			]
-		});
+		e.elements.push(
+			comment(),
+			makeElem('plugin',
+				makeElem('artifactId', makeText('maven-compiler-plugin')),
+				makeElem('configuration',
+					makeElem('compilerArgs',
+						makeElem('arg', makeText('-g'))
+					)
+				)
+			)
+		);
 	}
 
 	console.warn(`Will modify ${existingCompilerPlugins.length} maven-compiler-plugin <plugin> elements by adding '-g' arguments:`);
 
 	function addHyphenG(e) {
-		const commentHolder = { commented: false };		// Will be set true by the call to findOrMakeElement() that needs to add an element
+		const commentHolder = { commented: false };		// Will be set true by the first call to findOrMakeElement() that needs to add an element
 		const configuration = findOrMakeElement(e, 'configuration', commentHolder);
 		const compilerArgs = findOrMakeElement(configuration, 'compilerArgs', commentHolder);
 		if (!('elements' in compilerArgs)) {
@@ -143,7 +124,7 @@ function inject() {
 		if (!commentHolder.commented) {
 			compilerArgs.elements.push(comment());
 		}
-		compilerArgs.elements.push({ type: 'element', name: 'arg', elements: [{ type: 'text', text: '-g' }] });
+		compilerArgs.elements.push(makeElem('arg', makeText('-g')));
 	}
 
 	for (const e of existingCompilerPlugins) {
