@@ -33,9 +33,10 @@ for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
     CONTAINER_NAME="$(_jq '.name')"
     IMAGE="$(_jq '.image')"
     PREP_WORKTREE_CMD="$(_jq '.prep_worktree_cmd + '\"\")"
+    EXTRA_MVN_ARGS="$(_jq '.extra_mvn_args + '\"\")"
 
    	#echo "container name: ${CONTAINER_NAME}"
-   	echo "# ---- compiling projects using: ${IMAGE} then ${PREP_WORKTREE_CMD:-(nothing further)} -----"
+   	echo "# ---- compiling projects using: ${IMAGE} with extra mvn args '$EXTRA_MVN_ARGS' then ${PREP_WORKTREE_CMD:-(nothing further)} -----"
    	#echo ""
 
     for row2 in $(echo "${projects}" | jq -r '.[] | @base64'); do
@@ -56,10 +57,10 @@ for row in $(echo "${compilers}" | jq -r '.[] | @base64'); do
 			echo "ALL_PROJECT_$PROJECT_NAME: $JARS/$CONTAINER_NAME/$PROJECT_JAR.done"
 			echo "ALL_COMPILER_$CONTAINER_NAME: $JARS/$CONTAINER_NAME/$PROJECT_JAR.done"
 			echo "$JARS/$CONTAINER_NAME/$PROJECT_JAR.done:"
-			/usr/bin/echo -e '\t'./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS} "'$PREP_WORKTREE_CMD'" '&& touch $@'
+			/usr/bin/echo -e '\t'./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS} "'$PREP_WORKTREE_CMD'" "'$EXTRA_MVN_ARGS'" '&& touch $@'
 			echo
 		else
-			$ECHO_IF_DRY_RUN sh ./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS} "$SQUOTE$PREP_WORKTREE_CMD$SQUOTE"
+			$ECHO_IF_DRY_RUN sh ./docker-build-project.sh ${IMAGE} ${CONTAINER_NAME} ${PROJECT_NAME} ${PROJECT_JAR} ${PROJECT_TAG} ${JARS} "$SQUOTE$PREP_WORKTREE_CMD$SQUOTE" "$SQUOTE$EXTRA_MVN_ARGS$SQUOTE"
 		fi
 	done
 	echo "# -------------------------------------"

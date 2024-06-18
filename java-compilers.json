@@ -119,5 +119,25 @@
 	{
 		"image":"container-registry.oracle.com/java/jdk:20.0.1-ol8-amd64",
 		"name":"oraclejdk-20.0.1"
+	},
+	{
+		"image":"eclipse-temurin:8u372-b07-jdk",
+		"name":"openjdk-nodebug-8.0.372",
+		"extra_mvn_args":"-Dmaven.compiler.debug=false"
+	},
+	{
+		"image":"eclipse-temurin:11.0.19_7-jdk",
+		"name":"openjdk-nodebug-11.0.19",
+		"extra_mvn_args":"-Dmaven.compiler.debug=false"
+	},
+	{
+		"image":"eclipse-temurin:17.0.7_7-jdk",
+		"name":"openjdk-nodebug-17.0.7",
+		"extra_mvn_args":"-Dmaven.compiler.debug=false"
+	},
+	{
+		"image":"eclipse-temurin:20.0.1_9-jdk",
+		"name":"openjdk-nodebug-20.0.1",
+		"extra_mvn_args":"-Dmaven.compiler.debug=false"
 	}
 ]
