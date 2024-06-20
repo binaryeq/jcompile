@@ -10,6 +10,8 @@ import java.util.function.UnaryOperator;
 
 public class ProjectToJDKMajorVersion implements UnaryOperator<String> {
     public String apply(String compilerName) {
+        compilerName = compilerName.replaceFirst("-nodebug-", "-");
+
         if (compilerName.startsWith("openjdk-") && compilerName.contains(".")) {
             return compilerName.substring(0, compilerName.indexOf('.')).substring(8);
         } else if (compilerName.startsWith("ecj-") && compilerName.contains("_")) {
@@ -26,6 +28,8 @@ public class ProjectToJDKMajorVersion implements UnaryOperator<String> {
             }
 
             return jdkMajorVersionMap.get(ecjVersion);
+        } else if (compilerName.startsWith("oraclejdk-") && compilerName.contains(".")) {
+            return compilerName.substring(0, compilerName.indexOf('.')).substring(10);
         } else {
             throw new IllegalArgumentException("Could not identify compiler lineage for '" + compilerName + "'");
         }
