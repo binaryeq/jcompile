@@ -40,9 +40,14 @@ public class SameArtifactDifferentCompilerFromDotJarOracle implements JarOracle 
             for (String line : br.lines().toList()) {
                 Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
-                    Path compiler1 = jarFolder.resolve(labelMapper.lookup(matcher.group(1)));
-                    Path compiler2 = jarFolder.resolve(labelMapper.lookup(matcher.group(2)));
-                    oracle.add(Pair.of(compiler1, compiler2));
+                    String compiler1 = labelMapper.lookup(matcher.group(1));
+                    String compiler2 = labelMapper.lookup(matcher.group(2));
+                    for (Path jarPath1 : jarsByCompilerUsed.get(compiler1)) {
+                        Path jarPath2 = jarPath1.getParent().getParent().resolve(compiler2).resolve(jarPath1.getFileName());
+                        if (jarsByCompilerUsed.get(compiler2).contains(jarPath2)) {
+                            oracle.add(Pair.of(jarPath1, jarPath2));
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
