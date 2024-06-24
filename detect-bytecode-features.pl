@@ -5,7 +5,6 @@ use warnings;
 
 my $currentClass;
 my %has;
-my $inFunction = 0;
 
 sub outputClass() {
 	print join("\t", $currentClass, sort grep { $has{$_} } keys %has), "\n";
@@ -22,17 +21,11 @@ while (<JAVAP>) {
 		}
 		$currentClass = shift;
 		%has = ();
-		$inFunction = 0;
 	} else {
 		# JDK >= 11 uses "nests" to allow inner classes to access private members of outer classes directly, instead of creating synthetic methods in the outer class: https://openjdk.org/jeps/181
-		# A positive detection (exit code 0) means the *old* (JDK < 11) behaviour, since this is easier to test for.
-		if (/^  ([^ ].*);$/ && $1 =~ /static .* access\$[0-9]+\(/) {
-			$inFunction = 1;
-		} elsif (/^}?\s*$/) {
-			$inFunction = 0;
-		}
-
-		$has{JEP181} = 1 if $inFunction && /ACC_SYNTHETIC|Synthetic: true/;
+		# Originally, a positive detection meant the *old* (JDK < 11) behaviour, since this seemed easier to test for -- but now a positive detection means the *new* behaviour, since that is even
+		# easier and more reliable to test for. (Why not keep the same "polarity"? Because many class files don't have either definite marker, and this would flip the results for them in any case.)
+		$has{JEP181} = 1 if /^NestMembers:$/;
 
 		# JDK >= 9 uses special invokedynamic calls to concatenate string literals instead of StringBuilder: https://openjdk.org/jeps/280, https://docs.oracle.com/javase/9/docs/api/java/lang/invoke/StringConcatFactory.html
 		# A positive detection (exit code 0) means the *new* (JDK >= 9) behaviour, since this is easier to test for.
