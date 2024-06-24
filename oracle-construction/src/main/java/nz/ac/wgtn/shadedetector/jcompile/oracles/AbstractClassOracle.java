@@ -156,7 +156,19 @@ public abstract class AbstractClassOracle implements ClassOracle {
 
     // whether to include this (named) class reference in the oracle
     private boolean includeClassPair(ZipPath zpath1, ZipPath zpath2) throws IOException, URISyntaxException {
-        assert ! zpath1.outerPath().toString().equals(zpath2.outerPath().toString()) ;
+        assert !zpath1.outerPath().toString().equals(zpath2.outerPath().toString());
+        // Now we consider only the classes themselves, not their AICs
+        //return areClassesOrTheirAicsDifferent(zpath1, zpath2);
+        return areClassesDifferent(zpath1, zpath2);
+    }
+
+    private boolean areClassesDifferent(ZipPath zpath1, ZipPath zpath2) throws IOException, URISyntaxException {
+        byte[] content1 = read(zpath1.outerPath(), zpath1.innerPath());
+        byte[] content2 = read(zpath2.outerPath(), zpath2.innerPath());
+        return !Arrays.equals(content1, content2);
+    }
+
+    private boolean areClassesOrTheirAicsDifferent(ZipPath zpath1, ZipPath zpath2) throws IOException, URISyntaxException {
         if (!zpath1.allInnerPaths().equals(zpath2.allInnerPaths())) {
             return true;
         }
