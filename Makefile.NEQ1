@@ -1,0 +1,16 @@
+# Makefile to (re)build NEQ1 and its prerequisites.
+# Run this from a subdirectory of runs/ that contains a jars/EQ directory already.
+
+JCOMPILE_ROOT := $(shell git rev-parse --show-toplevel)
+
+all: NEQ1.tsv
+
+NEQ1.tsv: all.BREAKING all.POTENTIALLY_BREAKING
+	time java -cp $(JCOMPILE_ROOT)/oracle-construction/target/jcompile.jar nz.ac.wgtn.shadedetector.jcompile.oracles.AdjacentVersionSameArtifactAndCompilerClassOracle jars > $@
+
+generated_rules_for_NEQ1_revapi.mk:
+	echo "Regenerating make rules in $@..."
+	time java -cp $(JCOMPILE_ROOT)/oracle-construction/target/jcompile.jar nz.ac.wgtn.shadedetector.jcompile.oracles.AdjacentVersionSameArtifactAndCompilerJarOracle jars > jars_for_NEQ1.tsv
+	$(JCOMPILE_ROOT)/make-revapi-runner.sh < jars_for_NEQ1.tsv > $@
+
+include generated_rules_for_NEQ1_revapi.mk
