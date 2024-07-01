@@ -11,13 +11,28 @@ sub outputClass() {
 	print join("\t", $currentClass, sort grep { $has{$_} } keys %has), "\n";
 }
 
-open JAVAP, "-|", "javap", "-c", "-v", @ARGV or die;		# Open a pipe from javap, passing all other command-line args to it
+sub getClassesInJar($) {
+	my ($jarFName) = @_;
+	my @classes = map { m|202\d-\d\d-\d\d \d\d:\d\d (.*)\.class$| ? $1 : () } `unzip -l "$jarFName"`;	# Exclude '.class' from the end, since that's what javap wants with -cp jarfile.jar
+}
+
+my $jarFName;
+my @classes = @ARGV;
+if (@ARGV == 1) {
+	if ($ARGV[0] =~ /\.jar$/) {
+		# Jar mode
+		$jarFName = $ARGV[0];
+		@classes = getClassesInJar($ARGV[0]);
+	}
+}
+
+open JAVAP, "-|", "javap", "-c", "-v", (defined $jarFName ? ("-cp", $jarFName) : (), @classes or die;		# Open a pipe from javap, passing all other command-line args to it
 while (<JAVAP>) {
 	if (/^Classfile (.*)/) {
 		outputClass() if defined $currentClass;
 		my $newClass = $1;
-		while (@ARGV && $newClass !~ /\Q$ARGV[0]\E$/) {
-			print STDERR "Missing javap output for $ARGV[0] -- presumably it hit an error. Ignoring.\n";
+		while (@classes && $newClass !~ /\Q$classes[0]\E$/) {
+			print STDERR "Missing javap output for $classes[0] -- presumably it hit an error. Ignoring.\n";
 			shift;
 		}
 		$currentClass = shift;
