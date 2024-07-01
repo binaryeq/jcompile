@@ -39,15 +39,11 @@ if (@ARGV == 1) {
 	}
 }
 
-#open JAVAP, "-|", "javap", "-c", "-v", (defined $jarFName ? ("-cp", $jarFName) : ()), @classes or die;		# Open a pipe from javap, passing all other command-line args to it
-my @rest = ("javap", "-c", "-v", (defined $jarFName ? ("-cp", $jarFName) : ()), @classes);
-print STDERR "Command to run: <" . join(' ', @rest) . ">\n";	#DEBUG
-open JAVAP, "-|", @rest;		# Open a pipe from javap, passing all other command-line args to it
+open JAVAP, "-|", "javap", "-c", "-v", (defined $jarFName ? ("-cp", $jarFName) : ()), @classes or die;		# Open a pipe from javap, passing all other command-line args to it
 while (<JAVAP>) {
 	if (/^Classfile (.*)/) {
 		outputClass() if defined $currentClass;
 		my $newClass = $1;
-		print STDERR "Looking for <$classes[0].class> at the end of <$newClass>\n";	#DEBUG
 		while (@classes && $newClass !~ /\Q$classes[0]\E(?:\.class)?$/) {
 			print STDERR "Missing javap output for $classes[0] -- presumably it hit an error. Ignoring.\n";
 			shift @classes;
