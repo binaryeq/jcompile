@@ -69,6 +69,12 @@ if test '!' -x "$DETECT_BYTECODE_FEATURES"; then
 	exit 1
 fi
 
+DETECT_BYTECODE_FEATURES_OLDJEP181="$(pwd)/detect-bytecode-features-OLDJEP181.pl"
+if test '!' -x "$DETECT_BYTECODE_FEATURES_OLDJEP181"; then
+	echo "Cannot run $DETECT_BYTECODE_FEATURES_OLDJEP181, please ensure it is in the current directory."
+	exit 1
+fi
+
 mkdir -p ${RESULT_FOLDER}
 
 DATASET_HOST="$(pwd)/dataset"
@@ -139,6 +145,9 @@ if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	# Gather some additional metadata
 	( cd "${WORKTREE_HOST}" && find target/generated-sources target/generated-test-sources -type f -name '*.java' | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.generated-sources"	# Failure here creates a 0-length file, which is fine
 	( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' | xargs "$DETECT_BYTECODE_FEATURES" | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.bytecode-features"
+	# Following 2 lines for cross-checking new-style detection of JEP181 'NestMembers' against old-style detection. Not used actively downstreams.
+	( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' | xargs "$DETECT_BYTECODE_FEATURES_OLDJEP181" --first-digit-zero | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.bytecode-features-OLDJEP181.fdz"
+	( cd "${WORKTREE_HOST}" && find target -type f -name '*.class' | xargs "$DETECT_BYTECODE_FEATURES_OLDJEP181" --first-digit-nonzero | sort ) > "${RESULT_FOLDER}/${JAR_NAME}.bytecode-features-OLDJEP181.fdn"
 else 
 	echo "FAILURE! - copying error logs into ${RESULT_ERROR_LOG}"
 	cp ${TMP_LOG} ${RESULT_ERROR_LOG}
