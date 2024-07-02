@@ -10,10 +10,7 @@ for c in $( docker ps -q --filter 'name=jdk-' ); do
 	docker rm $c
 done
 
-for d in $( cd worktrees && ls ); do
-	foo=${d#pid*-}
-	proj=${foo%-*.*.*}
-	fullpath=$(realpath worktrees/$d)
-	echo "Removing worktree $fullpath from project $proj..."
-	git -C $JCOMPILE_ROOT/dataset/$proj worktree remove -f "$fullpath"
+for d in worktrees/*; do
+	echo "Removing worktree $d..."
+	git -C $d worktree remove -f .		# Nice that this works
 done
