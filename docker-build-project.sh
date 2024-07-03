@@ -123,7 +123,7 @@ echo "building project"
 # "docker exec -it" fails if stdin is not a terminal, e.g., when running in the background
 # "umask 0" to make downloaded artifacts, which will be saved in the shared cache as root, can be modified/deleted from the host. "exec" to keep mvn as pid 1, important for docker signal handling.
 [ "$STOP_BEFORE" = "mvn" ] && exit
-docker exec -t $DOCKER_CONTAINER sh -c "umask 0; exec ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -DskipTests -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true $EXTRA_MVN_ARGS clean package" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
+docker exec -t $DOCKER_CONTAINER sh -c "umask 0; exec ${MAVEN_CONTAINER}/bin/mvn -Dmaven.repo.local=${MAVEN_CACHE_CONTAINER} -Drat.skip=true -DskipTests -Dmaven.javadoc.skip=true -Dcyclonedx.skip=true -Danimal.sniffer.skip=true $EXTRA_MVN_ARGS clean package" | sed $'s,\x1b\\[[0-9;]*[a-zA-Z],,g' | tee ${TMP_LOG}
 # Some projects make files with restricted perms even if umask 0 is in force, and if --userns-remap is in force we otherwise wouldn't be able to delete them on the host afterwards.
 # Ignore "permission denied" on the top-level dir as it's owned by the host uid -- easier than trying to use wildcards to correctly get dotfiles and dotdirs.
 [ "$STOP_BEFORE" = "chmod" ] && exit
