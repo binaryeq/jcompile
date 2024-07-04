@@ -1,4 +1,5 @@
-CREATE TABLE EQ (
+CREATE TABLE IF NOT EXISTS EQ (
+  "run_id" TEXT,
   "container_1" TEXT,
   "container_2" TEXT,
   "class_1" TEXT,

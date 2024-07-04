@@ -1,2 +1,3 @@
 .read create_EQ_table.sql
-.import EQ.tsv EQ
+.mode tabs
+.import --skip 1 "|sed 's/^/'$RUNID'\t/' < $EQTSV" EQ
