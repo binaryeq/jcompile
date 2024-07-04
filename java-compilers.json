@@ -84,49 +84,49 @@
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.11.1.v20150902-1521_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.1",
-		"extra_mvn_args":"-Dmaven.compiler.target=1.8"
+		"extra_mvn_args":"-Dmaven.compiler.target=1.8 -Dmaven.compiler.source=1.8"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.12.3_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.2",
-		"extra_mvn_args":"-Dmaven.compiler.target=1.8"
+		"extra_mvn_args":"-Dmaven.compiler.target=1.8 -Dmaven.compiler.source=1.8"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.15.1_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.8.6",
-		"extra_mvn_args":"-Dmaven.compiler.target=1.9"
+		"extra_mvn_args":"-Dmaven.compiler.target=1.9 -Dmaven.compiler.source=1.9"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.24.0_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.9.0",
-		"extra_mvn_args":"-Dmaven.compiler.target=15"
+		"extra_mvn_args":"-Dmaven.compiler.target=15 -Dmaven.compiler.source=15"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.28.0_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.11.1",
-		"extra_mvn_args":"-Dmaven.compiler.target=17"
+		"extra_mvn_args":"-Dmaven.compiler.target=17 -Dmaven.compiler.source=17"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.29.0_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.12.0",
-		"extra_mvn_args":"-Dmaven.compiler.target=17"
+		"extra_mvn_args":"-Dmaven.compiler.target=17 -Dmaven.compiler.source=17"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.30.0_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.12.1",
-		"extra_mvn_args":"-Dmaven.compiler.target=18"
+		"extra_mvn_args":"-Dmaven.compiler.target=18 -Dmaven.compiler.source=18"
 	},
 	{
 		"image":"eclipse-temurin:11.0.19_7-jdk",
 		"name":"ecj-3.32.0_openjdk-11.0.19",
 		"prep_worktree_cmd":"./inject-ecj-compiler.pl 2.13.0",
-		"extra_mvn_args":"-Dmaven.compiler.target=19"
+		"extra_mvn_args":"-Dmaven.compiler.target=19 -Dmaven.compiler.source=19"
 	},
 	{
 		"image":"container-registry.oracle.com/java/jdk:8u371-ol8-amd64",
