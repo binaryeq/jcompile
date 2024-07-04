@@ -7,12 +7,14 @@
 #
 # Automatically regenerates rules to build each jar whenever dataset.json or java-compilers.json changes, by running ducker-build-all.sh --output-make-rules.
 
+JCOMPILE_ROOT := $(shell git rev-parse --show-toplevel)
+
 # ALL_JAR_DONES is not filled out until after the include, but make takes the first goal as the default.
 all: all_defined_after_include
 
-generated_rules_for_all_jars.mk: dataset.json java-compilers.json docker-build-all.sh
+generated_rules_for_all_jars.mk: $(JCOMPILE_ROOT)/dataset.json $(JCOMPILE_ROOT)/java-compilers.json $(JCOMPILE_ROOT)/docker-build-all.sh
 	echo "Regenerating make rules in $@ from $^..."
-	./docker-build-all.sh --output-make-rules > $@
+	$(JCOMPILE_ROOT)/docker-build-all.sh --output-make-rules > $@
 
 # GNU make knows to regenerate this, but only when needed
 include generated_rules_for_all_jars.mk
