@@ -6,7 +6,7 @@ JCOMPILE_ROOT := $(shell git rev-parse --show-toplevel)
 all: NEQ1.tsv
 
 NEQ1.tsv: all.BREAKING all.POTENTIALLY_BREAKING
-	time java -cp $(JCOMPILE_ROOT)/oracle-construction/target/jcompile.jar nz.ac.wgtn.shadedetector.jcompile.oracles.AdjacentVersionSameArtifactAndCompilerClassOracle jars > $@
+	( time java -cp $(JCOMPILE_ROOT)/oracle-construction/target/jcompile.jar nz.ac.wgtn.shadedetector.jcompile.oracles.AdjacentVersionSameArtifactAndCompilerClassOracle jars > $@ ) 2>&1 | tee make_NEQ1_tsv.log
 
 generated_rules_for_NEQ1_revapi.mk:
 	echo "Regenerating make rules in $@..."
