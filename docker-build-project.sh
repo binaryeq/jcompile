@@ -2,7 +2,7 @@
 
 # Build a given mvn project using a Java compiler provided by a docker container. 
 # Maven is provided by the host to ensure consistency, and the creation of further images. 
-# For performance, the Maven cache is also provided by the host at $(pwd)/.m2 and shared across
+# For performance, the Maven cache is also provided by the host at $JCOMPILE_ROOT/.m2 and shared across
 # runs; you can override its location by setting MAVEN_CACHE_HOST in the environment.
 # As a debugging aid, setting the env var STOP_BEFORE to certain values will stop the script at certain points.
 # @author jens dietrich
@@ -17,6 +17,9 @@ TAG=$5
 RESULT_ROOT_FOLDER=$6
 PREP_WORKTREE_CMD="$7"
 EXTRA_MVN_ARGS="$8"
+
+# We expect other scripts to live here
+JCOMPILE_ROOT=$(git rev-parse --show-toplevel)
 
 # Make the container name unique to each process to enable parallel builds
 DOCKER_CONTAINER="${DOCKER_CONTAINER_BASENAME}__pid$$"
@@ -62,23 +65,28 @@ if test -f "${RESULT_ERROR_LOG}"; then
     exit 0
 fi
 
+KEEP_ONLY_CLASSES_IN_JAR="$JCOMPILE_ROOT/keep-only-classes-in-jar.sh"
+if test '!' -x "$KEEP_ONLY_CLASSES_IN_JAR"; then
+	echo "Cannot find executable $KEEP_ONLY_CLASSES_IN_JAR."
+	exit 1
+fi
 
-DETECT_BYTECODE_FEATURES="$(pwd)/detect-bytecode-features.pl"
+DETECT_BYTECODE_FEATURES="$JCOMPILE_ROOT/detect-bytecode-features.pl"
 if test '!' -x "$DETECT_BYTECODE_FEATURES"; then
-	echo "Cannot run $DETECT_BYTECODE_FEATURES, please ensure it is in the current directory."
+	echo "Cannot find executable $DETECT_BYTECODE_FEATURES."
 	exit 1
 fi
 
 # No longer run as it's slow and we don't use the results
-DETECT_BYTECODE_FEATURES_OLDJEP181="$(pwd)/detect-bytecode-features-OLDJEP181.pl"
+DETECT_BYTECODE_FEATURES_OLDJEP181="$JCOMPILE_ROOT/detect-bytecode-features-OLDJEP181.pl"
 if test '!' -x "$DETECT_BYTECODE_FEATURES_OLDJEP181"; then
-	echo "Cannot run $DETECT_BYTECODE_FEATURES_OLDJEP181, please ensure it is in the current directory."
+	echo "Cannot find executable $DETECT_BYTECODE_FEATURES_OLDJEP181."
 	exit 1
 fi
 
 mkdir -p ${RESULT_FOLDER}
 
-DATASET_HOST="$(pwd)/dataset"
+DATASET_HOST="$JCOMPILE_ROOT/dataset"
 DATASET_CONTAINER="/dataset"
 
 echo "checking out tag ${TAG} to ${WORKTREE_HOST}"
@@ -91,12 +99,12 @@ if test -n "$PREP_WORKTREE_CMD"; then
 	( umask 0; $PREP_WORKTREE_CMD "$WORKTREE_HOST" )
 fi
 
-MAVEN_HOST="$(pwd)/apache-maven-3.9.2"
+MAVEN_HOST="$JCOMPILE_ROOT/apache-maven-3.9.2"
 MAVEN_CONTAINER="/apache-maven"
 
 echo "using data folder ${DATASET_HOST}"
 
-MAVEN_CACHE_HOST=${MAVEN_CACHE_HOST:-$(pwd)/.m2}     # Default to $(pwd)/.m2 unless env var already set
+MAVEN_CACHE_HOST=${MAVEN_CACHE_HOST:-$JCOMPILE_ROOT/.m2}     # Default to $JCOMPILE_ROOT/.m2 unless env var already set
 echo "using Maven cache dir ${MAVEN_CACHE_HOST}"
 MAVEN_CACHE_CONTAINER="/maven-cache"
 
@@ -140,7 +148,7 @@ if test -f "${WORKTREE_HOST}/target/${JAR_NAME}"; then
 	TEST_JAR_PATH="${WORKTREE_HOST}/target/${JAR_NAME%%.jar}-tests.jar"
 	if test -f $TEST_JAR_PATH; then
 		echo "Found tests jar $TEST_JAR_PATH, copying that also but stripping out non-class files."
-		./keep-only-classes-in-jar.sh "$TEST_JAR_PATH" "$RESULT_FOLDER/${TEST_JAR_PATH##*/}"
+		"$KEEP_ONLY_CLASSES_IN_JAR" "$TEST_JAR_PATH" "$RESULT_FOLDER/${TEST_JAR_PATH##*/}"
 	fi
 
 	# Gather some additional metadata
