@@ -6,10 +6,10 @@
 
 JCOMPILE_ROOT=$(git rev-parse --show-toplevel)
 
-compilers=`cat java-compilers.json`
-#compilers=`cat java-compilers-debug.json`
-projects=`cat dataset.json`
-#projects=`cat dataset-debug.json`
+compilers=`cat $JCOMPILE_ROOT/java-compilers.json`
+#compilers=`cat $JCOMPILE_ROOT/java-compilers-debug.json`
+projects=`cat $JCOMPILE_ROOT/dataset.json`
+#projects=`cat $JCOMPILE_ROOT/dataset-debug.json`
 
 
 ECHO_IF_DRY_RUN=
