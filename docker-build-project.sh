@@ -96,7 +96,7 @@ mkdir -p $(dirname "${WORKTREE_HOST}")
 
 if test -n "$PREP_WORKTREE_CMD"; then
 	#( umask 0; cd "$WORKTREE_HOST"; $PREP_WORKTREE_CMD )
-	( umask 0; $PREP_WORKTREE_CMD "$WORKTREE_HOST" )
+	( umask 0; cd "$JCOMPILE_ROOT"; $PREP_WORKTREE_CMD "$WORKTREE_HOST" )
 fi
 
 MAVEN_HOST="$JCOMPILE_ROOT/apache-maven-3.9.2"
