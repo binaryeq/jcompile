@@ -21,6 +21,8 @@ SMALL_RESULT_FILES := $(foreach x,$(SMALL_RESULTS),$(PAPER_ROOT)/generated/$x.te
 # Goals
 all: $(TSVS) $(TABLES) $(SMALL_RESULT_FILES)
 
+small_results: $(SMALL_RESULT_FILES)
+
 # Every generated .tex file depends on the script used to make it. Anything else it depends on (e.g., a .tsv file) should be added as extra separate prerequisites.
 $(SMALL_RESULT_FILES): $(PAPER_ROOT)/generated/%.tex: $(SCRIPTS)/make.%.sh
 	mkdir -p `dirname $@`
