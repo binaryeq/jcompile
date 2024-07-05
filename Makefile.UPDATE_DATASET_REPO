@@ -1,0 +1,57 @@
+ifndef DATASET_ROOT
+$(error You must define DATASET_ROOT.)
+endif
+
+ifndef JMUTATE_ROOT
+$(error You must define JMUTATE_ROOT.)
+endif
+
+JCOMPILE_ROOT := $(shell git rev-parse --show-toplevel)
+
+update: update_EQ update_NEQ1 update_NEQ2
+
+update_EQ: update_EQ_jars update_EQ_tsv update_EQ_supplementary
+
+update_NEQ1: update_NEQ1_tsv update_NEQ1_supplementary
+
+update_NEQ2: update_NEQ2_jars update_NEQ2_tsv update_NEQ2_supplementary
+
+update_EQ_tsv:
+	gzip -9 -k EQ.tsv
+	cp EQ.tsv.gz $(DATASET_ROOT)
+
+update_NEQ1_tsv:
+	cp NEQ1.tsv $(DATASET_ROOT)
+
+update_NEQ2_tsv:
+	cp $(JMUTATE_ROOT)/NEQ2.tsv $(DATASET_ROOT)
+
+update_EQ_jars: make_hardlinks
+	rm -r $(DATASET_ROOT)/jars/EQ
+	for f in hardlinks_for_pcloud_upload/dataset*/jars/EQ/*/*; do d=`dirname $${f#hardlinks_for_pcloud_upload/dataset*/}`; fullpath=`realpath $$f`; ( cd $(DATASET_ROOT) && mkdir -p $$d && cd $$d && cp -ar $$fullpath . ); done
+
+make_hardlinks:
+	#TODO: Make hardlink dir for upload to pCloud too
+
+update_NEQ2_jars:
+	# NEQ2 jars no longer get uploaded to GitHub because some of them exceed the 100MB hard limit
+
+update_NEQ1_supplementary: revapi-results.zip
+	mkdir -p $(DATASET_ROOT)/supplementary/NEQ1
+	cp -ar $< $(DATASET_ROOT)/supplementary/NEQ1
+
+update_NEQ2_supplementary:
+	# There is no NEQ2 supplementary.
+
+update_supplementary: update_EQ_supplementary update_NEQ2_supplementary
+
+update_EQ_supplementary: build-failures.zip
+	mkdir -p $(DATASET_ROOT)/supplementary/EQ
+	cp -ar $< $(DATASET_ROOT)/supplementary/EQ
+
+# Actual real file targets!
+build-failures.zip:
+	zip -9 $@ jars/EQ/*/*.jar.error
+
+revapi-results.zip:
+	zip -9 $@ jars/EQ/*/*.revapi.*
