@@ -1,0 +1,21 @@
+ifndef DATASET_ROOT
+$(error You must define DATASET_ROOT.)
+endif
+
+ifndef JMUTATE_ROOT
+$(error You must define JMUTATE_ROOT.)
+endif
+
+JCOMPILE_ROOT := $(shell git rev-parse --show-toplevel)
+
+update: update_EQ_jars update_tsvs
+
+update_tsvs:
+	cp EQ.tsv NEQ1.tsv $(JMUTATE_ROOT)/NEQ2.tsv $(DATASET_ROOT)
+
+update_EQ_jars: make_hardlinks
+	rm -r $(DATASET_ROOT)/jars/EQ
+	for f in hardlinks_for_pcloud_upload/dataset*/jars/EQ/*/*; do d=`dirname $${f#hardlinks_for_pcloud_upload/dataset*/}`; fullpath=`realpath $$f`; ( cd $(DATASET_ROOT) && mkdir -p $$d && cd $$d && cp -ar $$fullpath . ); done
+
+make_hardlinks:
+	#TODO: Make hardlink dir for upload to pCloud too
