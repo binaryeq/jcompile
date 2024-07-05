@@ -12,7 +12,7 @@ update: update_EQ update_NEQ1 update_NEQ2
 
 update_EQ: update_EQ_jars update_EQ_tsv update_EQ_supplementary
 
-update_NEQ1: update_NEQ1_tsv
+update_NEQ1: update_NEQ1_tsv update_NEQ1_supplementary
 
 update_NEQ2: update_NEQ2_jars update_NEQ2_tsv update_NEQ2_supplementary
 
@@ -36,6 +36,10 @@ make_hardlinks:
 update_NEQ2_jars:
 	# NEQ2 jars no longer get uploaded to GitHub because some of them exceed the 100MB hard limit
 
+update_NEQ1_supplementary: revapi-results.zip
+	mkdir -p $(DATASET_ROOT)/supplementary/NEQ1
+	cp -ar $< $(DATASET_ROOT)/supplementary/NEQ1
+
 update_NEQ2_supplementary:
 	# There is no NEQ2 supplementary.
 
@@ -45,6 +49,9 @@ update_EQ_supplementary: build-failures.zip
 	mkdir -p $(DATASET_ROOT)/supplementary/EQ
 	cp -ar $< $(DATASET_ROOT)/supplementary/EQ
 
-# An actual real file target!
+# Actual real file targets!
 build-failures.zip:
 	zip -9 $@ jars/EQ/*/*.jar.error
+
+revapi-results.zip:
+	zip -9 $@ jars/EQ/*/*.revapi.*
