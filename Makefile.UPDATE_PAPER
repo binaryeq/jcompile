@@ -13,13 +13,21 @@ TABLES := $(PAPER_ROOT)/generated/table-3.tex $(PAPER_ROOT)/generated/table-4.te
 
 SMALL_RESULTS := \
 	main-jar-count \
-	test-jar-count
+	test-jar-count \
+	eq-record-count
 
 SMALL_RESULT_FILES := $(foreach x,$(SMALL_RESULTS),$(PAPER_ROOT)/generated/$x.tex)
 
 # Goals
 all: $(TSVS) $(TABLES) $(SMALL_RESULT_FILES)
 
-# Giving all .tsv files is conservative; some results may depend on much less.
-$(SMALL_RESULT_FILES): $(PAPER_ROOT)/generated/%.tex: $(SCRIPTS)/make.%.sh $(TSVS)
+# Every generated .tex file depends on the script used to make it. Anything else it depends on (e.g., a .tsv file) should be added as extra separate prerequisites.
+$(SMALL_RESULT_FILES): $(PAPER_ROOT)/generated/%.tex: $(SCRIPTS)/make.%.sh
+	mkdir -p `dirname $@`
 	$(SCRIPTS)/make.$*.sh > $@
+
+$(PAPER_ROOT)/generated/main-jar-count.tex: EQ.tsv
+
+$(PAPER_ROOT)/generated/test-jar-count.tex: EQ.tsv
+
+$(PAPER_ROOT)/generated/eq-record-count.tex: EQ.tsv
