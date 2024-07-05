@@ -1,2 +1,2 @@
 #!/bin/sh
-find jars/EQ -name '*-test.jar' | wc -l
+find jars/EQ -name '*-tests.jar' | wc -l
