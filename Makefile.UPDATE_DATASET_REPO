@@ -8,10 +8,23 @@ endif
 
 JCOMPILE_ROOT := $(shell git rev-parse --show-toplevel)
 
-update: update_EQ_jars update_tsvs update_supplementary
+update: update_EQ update_NEQ1 update_NEQ2
 
-update_tsvs:
-	cp EQ.tsv NEQ1.tsv $(JMUTATE_ROOT)/NEQ2.tsv $(DATASET_ROOT)
+update_EQ: update_EQ_jars update_EQ_tsv update_EQ_supplementary
+
+update_NEQ1: update_NEQ1_tsv
+
+update_NEQ2: update_NEQ2_jars update_NEQ2_tsv update_NEQ2_supplementary
+
+update_EQ_tsv:
+	gzip -9 -k EQ.tsv
+	cp EQ.tsv.gz $(DATASET_ROOT)
+
+update_NEQ1_tsv:
+	cp NEQ1.tsv $(DATASET_ROOT)
+
+update_NEQ2_tsv:
+	cp $(JMUTATE_ROOT)/NEQ2.tsv $(DATASET_ROOT)
 
 update_EQ_jars: make_hardlinks
 	rm -r $(DATASET_ROOT)/jars/EQ
@@ -19,6 +32,12 @@ update_EQ_jars: make_hardlinks
 
 make_hardlinks:
 	#TODO: Make hardlink dir for upload to pCloud too
+
+update_NEQ2_jars:
+	# NEQ2 jars no longer get uploaded to GitHub because some of them exceed the 100MB hard limit
+
+update_NEQ2_supplementary:
+	# There is no NEQ2 supplementary.
 
 update_supplementary: update_EQ_supplementary update_NEQ2_supplementary
 
@@ -28,4 +47,4 @@ update_EQ_supplementary: build-failures.zip
 
 # An actual real file target!
 build-failures.zip:
-	zip -9 $@ jars/EQ/*.*.jar.error
+	zip -9 $@ jars/EQ/*/*.jar.error
