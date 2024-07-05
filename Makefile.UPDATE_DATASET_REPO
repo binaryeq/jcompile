@@ -8,7 +8,7 @@ endif
 
 JCOMPILE_ROOT := $(shell git rev-parse --show-toplevel)
 
-update: update_EQ_jars update_tsvs
+update: update_EQ_jars update_tsvs update_supplementary
 
 update_tsvs:
 	cp EQ.tsv NEQ1.tsv $(JMUTATE_ROOT)/NEQ2.tsv $(DATASET_ROOT)
@@ -19,3 +19,13 @@ update_EQ_jars: make_hardlinks
 
 make_hardlinks:
 	#TODO: Make hardlink dir for upload to pCloud too
+
+update_supplementary: update_EQ_supplementary update_NEQ2_supplementary
+
+update_EQ_supplementary: build-failures.zip
+	mkdir -p $(DATASET_ROOT)/supplementary/EQ
+	cp -ar $< $(DATASET_ROOT)/supplementary/EQ
+
+# An actual real file target!
+build-failures.zip:
+	zip -9 $@ jars/EQ/*.*.jar.error
